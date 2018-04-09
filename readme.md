@@ -61,3 +61,6 @@ sudo node /etc/fibre/fibre.js &
 ```
 
 with the above command you can press *Ctrl + C* to release from the terminal, leaving the server to run in the background.
+
+# Read the manual
+Now you have Fibre Framework setup you should head over to [Fibre Framework's](http://fibreframework.com/) website and read the manual.
