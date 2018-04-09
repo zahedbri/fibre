@@ -27,6 +27,9 @@ if [ -d "fibre" ]; then
         # Copy update and install scripts
         cp fibre/install.sh install.sh
         cp fibre/update.sh update.sh
+        
+        # Copy node_modules
+        cp -R fibre/node_modules/. node_modules/
 
 fi
 
