@@ -2,7 +2,7 @@
 
 # Log
 echo ""
-echo "-> Updating Fibre from [1.0.1] to [1.0.1]..."
+echo "-> Updating Fibre to [1.0.1]..."
 
 # Set repository URL
 repo_url="https://github.com/Fibre-Framework/fibre.git"
