@@ -1,0 +1,25 @@
+{
+    "websites": {
+        "default": {
+            "name": "My default website",
+            "website_root": "/var/web/",
+            "document_root": "/var/web/",
+            "default_document": [".html"],
+            "network": {
+                "bind_address": "0.0.0.0"
+            },
+            "http": {
+                "port": 80,
+                "enabled": true
+            },
+            "https": {
+                "port": 443,
+                "certificate_path": "/certs/",
+                "enabled": false
+            },
+            "extensions": {
+
+            }
+        }
+    }
+}

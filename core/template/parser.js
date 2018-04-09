@@ -1,0 +1,161 @@
+"use strict";
+
+// Require modules
+const fs = require('fs');
+const Engine = require('./engine');
+
+/**
+ * Class: Parser
+ */
+module.exports = class Parser {
+    constructor(raw, data_layer, website){
+
+        this.require_parse = 0;
+
+        // Setup
+        this.parser_actions = ['parse_variables', 'parse_includes'];
+        this.parser_actions_completed = 0;
+
+        // Raw source
+        this.raw_source = raw;
+
+        // Data Layer
+        this.data_layer = data_layer;
+
+        // Website
+        this.website = website;
+
+        // Errors
+        this.errors = [];
+
+        // Promise
+        return new Promise((resolve, reject) => {
+
+            // Iterate over each action to be performed
+            this.parser_actions.forEach(parser_action => {
+                this[parser_action]().then(() => {
+
+                    // Good
+                    this.parser_actions_completed++;
+
+                    // Check for done
+                    if(this.parser_actions_completed === this.parser_actions.length){
+
+                        // Check for errors
+                        if(this.errors.length == 0){
+                            resolve({
+                                require_another_pass: this.require_parse,
+                                source: this.raw_source
+                            });
+                        }else{
+                            reject(this.errors);
+                        }
+
+                    }
+
+                }).catch((parse_error) => {
+
+                    // Log
+                    console.log(parse_error);
+
+                });
+            });
+
+        });
+
+    }
+
+    /**
+     * Parse Variables
+     */
+    parse_variables(){
+        return new Promise((resolve, reject) => {
+
+            // Get all the matches
+            var variable_placeholders = this.raw_source.match(/{{\s[a-z].+\s}}/g);
+
+            // Iterate
+            if('undefined' !== typeof variable_placeholders && Array.isArray(variable_placeholders) && variable_placeholders.length > 0){
+                variable_placeholders.forEach(item => {
+
+                    // Get variable name
+                    let var_name = item.toString().replace('{{','').replace('}}','').trim()
+
+                    // Check the variable is in the data layer
+                    try {
+
+                        if('undefined' !== typeof this.data_layer[var_name]){
+
+                            // Replace
+                            this.raw_source = this.raw_source.replace(item, decodeURIComponent(this.data_layer[var_name]));
+
+                        }else{
+
+                            // Replace with nothing
+                            this.raw_source = this.raw_source.replace(item, '');
+
+                        }
+
+                    } catch (variable_error) {
+                        this.errors.push(`The variable ${var_name} is not defined in your data layer.`);
+                    }
+
+                });
+            }
+
+            resolve();
+
+        });
+    }
+
+    /**
+     * Parse Includes
+     */
+    parse_includes(){
+        return new Promise((resolve, reject) => {
+
+            // Include statements
+            let include_statements = this.raw_source.match(/@include\s"[a-zA-Z._]+"/g);
+
+            // Iterate
+            if('undefined' !== typeof include_statements && Array.isArray(include_statements) && include_statements.length > 0){
+                include_statements.forEach(include_statement => {
+
+                    // Get view name
+                    let view_name_matches = include_statement.match(/"([a-zA-Z._]+)"/);
+                    if(view_name_matches && 'undefined' !== typeof view_name_matches[1]){
+
+                        // Make the view name
+                        let include_view_name = view_name_matches[1].toString().toLowerCase().replace(".","/");
+
+                        // Check if the view exists
+                        try {
+
+                            let sub_view = fs.readFileSync( this.website.website_root + '/views/' + include_view_name + '.html', global._fibre_app.encoding.text);
+
+                            // Replace
+                            this.raw_source = this.raw_source.replace(include_statement, sub_view.toString(), 1);
+
+                            // Require another pass through
+                            this.require_parse = 1;
+
+                        } catch (include_error) {
+                            this.errors.push("The view does not exist.");
+                        }
+
+                    }else{
+
+                        // Invalid Syntax
+                        this.errors.push("There is a syntax error for an include statement.");
+
+                    }
+
+                });
+            }
+
+            resolve();
+
+        });
+    }
+
+}
