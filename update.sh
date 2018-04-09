@@ -2,10 +2,10 @@
 
 # Log
 echo ""
-echo "-> Updating Fibre from [1.0.0] to [1.0.0]..."
+echo "-> Updating Fibre..."
 
 # Set repository URL
-repo_url="https://github.com/mrbenosborne/fibre.git"
+repo_url="https://github.com/Fibre-Framework/fibre.git"
 
 # Remove old fibre directory if still exists
 if [ -d "fibre" ]; then
