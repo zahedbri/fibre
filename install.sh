@@ -5,7 +5,7 @@ echo ""
 echo "-> Installing Fibre [1.0.1]..."
 
 # Set repository URL
-repo_url="https://github.com/Fibre-Framework/fibre/releases/latest"
+repo_url="https://github.com/Fibre-Framework/fibre.git"
 
 # Remove old fibre directory if still exists
 if [ -d "fibre" ]; then
