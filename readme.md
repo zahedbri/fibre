@@ -64,3 +64,10 @@ with the above command you can press *Ctrl + C* to release from the terminal, le
 
 # Read the manual
 Now you have Fibre Framework setup you should head over to [Fibre Framework's](http://fibreframework.com/) website and read the manual.
+
+### Other command line commands
+* "v" or "version" - Display's the current version of Fibre.
+
+### Operating Systems Supported
+* UNIX
+* Windows

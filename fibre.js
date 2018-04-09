@@ -2,6 +2,7 @@
 
 // Set a global namespace for our app
 global._fibre_app = {
+    version: '1.0.2',
     os_win: process.platform === "win32",
     encoding: {
         text: "utf8"
@@ -20,7 +21,7 @@ global._fibre_app = {
 };
 
 // Setup a list of arguments that will bypass server start
-const arguments_bypass_server_boot = ['enable_extension', 'disable_extension', 'create-project'];
+const arguments_bypass_server_boot = ['version', 'v', 'create-project'];
 let bypass = false;
 let arguments_arr = [];
 
@@ -96,6 +97,11 @@ new StartupCheck().then(( args ) => {
                         console.log(`-> Please provide a full path to where you would like Fibre to setup a project.`);
                     }
 
+                }
+
+                // Version
+                if(['v','version'].indexOf(key) > -1){
+                    console.log(`-> Fibre is running on version ${global._fibre_app.version}.`);
                 }
 
             }
