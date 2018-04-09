@@ -27,7 +27,7 @@ if [ -d "fibre" ]; then
         # Copy update and install scripts
         cp fibre/install.sh install.sh
         cp fibre/update.sh update.sh
-        
+
         # Copy node_modules
         cp -R fibre/node_modules/. node_modules/
 
@@ -36,6 +36,13 @@ fi
 # Remove fibre folder
 rm -R fibre/
 
+# Get version number
+if [ -f "version.txt" ]; then
+        version=$(cat "version.txt")
+else
+        version="UNKNOWN"
+fi
+
 # Install done
-echo "-> Fibre has been updated successfully!"
+echo "-> Fibre has been updated successfully to version [$version]!"
 echo "-> Enjoy!"
