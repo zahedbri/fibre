@@ -13,7 +13,7 @@ module.exports = class Parser {
         this.require_parse = 0;
 
         // Setup
-        this.parser_actions = ['parse_variables', 'parse_includes', 'parse_if'];
+        this.parser_actions = ['parse_variables', 'parse_includes', 'parse_if', 'parse_foreach'];
         this.parser_actions_completed = 0;
 
         // Raw source
@@ -207,6 +207,57 @@ module.exports = class Parser {
                         }
 
                     }
+
+                });
+            }
+
+            resolve();
+
+        });
+    }
+
+    parse_foreach(){
+        return new Promise((resolve, reject) => {
+
+            // Include statements
+            let foreach_statements = this.raw_source.match(new RegExp(/(@foreach)(\()([a-zA-Z]+)\s(in)\s([a-zA-Z.]+)(\))([\s\S]*?)(@endforeach)/g));
+
+            // Iterate
+            if('undefined' !== typeof foreach_statements && Array.isArray(foreach_statements) && foreach_statements.length > 0){
+                foreach_statements.forEach(statement => {
+                    
+                    // Get groups
+                    let match_groups = statement.match(/(@foreach)(\()([a-zA-Z]+)\s(in)\s([a-zA-Z.]+)(\))([\s\S]*?)(@endforeach)/);
+                    
+                    // Iterator variable name
+                    const ite_var_name = match_groups[3].toString().trim();
+
+                    // List var in data layer
+                    const ite_list = match_groups[5].toString().trim();
+
+                    // Parse the contents of group 7
+                    const to_parse_on_iteration = match_groups[7].toString();
+
+                    try {
+
+                        ((dl) => {
+
+                            // Get the list
+                            var list = eval(ite_list);
+
+                            list.forEach((element, i) => {
+                                
+                                eval(ite_var_name + '= 1;');
+
+                                console.log(eval(ite_var_name));
+
+                            });
+
+                        })(this.data_layer);                    
+
+                    } catch (error) {                        
+                        console.log(error);
+                    }                    
 
                 });
             }
