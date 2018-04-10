@@ -13,7 +13,7 @@ module.exports = class Parser {
         this.require_parse = 0;
 
         // Setup
-        this.parser_actions = ['parse_variables', 'parse_includes'];
+        this.parser_actions = ['parse_variables', 'parse_includes', 'parse_if'];
         this.parser_actions_completed = 0;
 
         // Raw source
@@ -147,6 +147,64 @@ module.exports = class Parser {
 
                         // Invalid Syntax
                         this.errors.push("There is a syntax error for an include statement.");
+
+                    }
+
+                });
+            }
+
+            resolve();
+
+        });
+    }
+
+    parse_if(){
+        return new Promise((resolve, reject) => {
+
+            // Include statements
+            let if_statements = this.raw_source.match(/(@if\(.+\))[\s\S]*?(@endif)/g);
+
+            // Iterate
+            if('undefined' !== typeof if_statements && Array.isArray(if_statements) && if_statements.length > 0){
+                if_statements.forEach(if_statement => {
+
+                    // Get match groups
+                    let match_groups = if_statement.match(/@if\(.+\)([\s\S]*?)@endif/);
+                    let replaced_content = '';
+                    if(match_groups && match_groups.length >= 1){
+                        replaced_content = match_groups[1].toString().trim();
+                    }else{
+                        replaced_content = '';
+                    }
+
+                    // Match the inner part of the IF condition and retrieve
+                    let if_inner_match = if_statement.match(/(@if\((.+)\))/);
+                    if(if_inner_match){
+
+                        // The inner between brackets, "variable == true"
+                        let if_to_evaulate = if_inner_match[2].toString().trim();
+
+                        // Try
+                        let result = false;
+                        try {
+
+                            result = ((dl) => {
+
+                                return eval(if_to_evaulate);
+
+                            })(this.data_layer);
+
+                            // Check result
+                            if(result || result.toString().trim() == 'true'){
+                                this.raw_source = this.raw_source.replace(if_statement, replaced_content);
+                            }else{
+                                this.raw_source = this.raw_source.replace(if_statement, '');
+                            }
+
+                        } catch (error) {
+                            this.raw_source = this.raw_source.replace(if_statement, '');
+                            console.log(error);
+                        }
 
                     }
 

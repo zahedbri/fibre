@@ -68,6 +68,10 @@ module.exports = class StartupCheck {
 
                     }
 
+                }else{
+                    if(index > 1){
+                        return_args[arg] = arg;
+                    }
                 }
 
             });
