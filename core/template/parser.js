@@ -13,7 +13,7 @@ module.exports = class Parser {
         this.require_parse = 0;
 
         // Setup
-        this.parser_actions = ['parse_variables', 'parse_includes', 'parse_if'];
+        this.parser_actions = ['parse_foreach', 'parse_variables', 'parse_includes', 'parse_if'];
         this.parser_actions_completed = 0;
 
         // Raw source
@@ -45,7 +45,8 @@ module.exports = class Parser {
                         if(this.errors.length == 0){
                             resolve({
                                 require_another_pass: this.require_parse,
-                                source: this.raw_source
+                                source: this.raw_source,
+                                data_layer: this.data_layer
                             });
                         }else{
                             reject(this.errors);
@@ -81,18 +82,25 @@ module.exports = class Parser {
                     // Get variable name
                     let var_name = item.toString().replace('{{','').replace('}}','').trim()
 
+                    // Get depth level
+                    var var_depth = var_name.split(".").length;
+
                     // Check the variable is in the data layer
                     try {
 
-                        if('undefined' !== typeof this.data_layer[var_name]){
+                        if(var_depth <= 1){
 
-                            // Replace
-                            this.raw_source = this.raw_source.replace(item, decodeURIComponent(this.data_layer[var_name]));
+                            if('undefined' !== typeof this.data_layer[var_name]){
 
-                        }else{
+                                // Replace
+                                this.raw_source = this.raw_source.replace(item, decodeURIComponent(this.data_layer[var_name]));
 
-                            // Replace with nothing
-                            this.raw_source = this.raw_source.replace(item, '');
+                            }else{
+
+                                // Replace with nothing
+                                this.raw_source = this.raw_source.replace(item, '');
+
+                            }
 
                         }
 
@@ -211,6 +219,46 @@ module.exports = class Parser {
                 });
             }
 
+            resolve();
+
+        });
+    }
+
+    parse_foreach(){
+        return new Promise((resolve, reject) => {
+
+            // Include statements
+            let foreach_statements = this.raw_source.match(new RegExp(/(@fibre)([\s\S]*?)(@endfibre)/g));
+
+            // Iterate
+            if('undefined' !== typeof foreach_statements && Array.isArray(foreach_statements) && foreach_statements.length > 0){
+                foreach_statements.forEach(statement => {
+
+                    // Get groups
+                    let match_groups = statement.match(/(@fibre)([\s\S]*?)(@endfibre)/);
+
+                    // Parse the contents
+                    const to_parse_on_iteration = match_groups[2].toString();
+
+                    try {
+
+                        let _fibre_app_html = ((dl) => {
+
+                            return eval("(() => {" + to_parse_on_iteration + "})();");
+
+                        })(this.data_layer);
+
+                        // Replace
+                        this.raw_source = this.raw_source.replace(statement, _fibre_app_html);
+
+                    } catch (error) {
+                        reject("Error in user's code.");
+                    }
+
+                });
+            }
+
+            // Require parse
             resolve();
 
         });

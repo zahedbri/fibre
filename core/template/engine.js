@@ -34,7 +34,7 @@ module.exports = class Engine {
         // Send to the parser
         new Parser(raw_source, data_layer, website).then((parse_data) => {
             if(parse_data.require_another_pass === 1){
-                this.execute(parse_data.source, data_layer, website, fn);
+                this.execute(parse_data.source, parse_data.data_layer, website, fn);
             }else{
                 fn(parse_data);
             }
