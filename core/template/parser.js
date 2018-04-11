@@ -13,7 +13,7 @@ module.exports = class Parser {
         this.require_parse = 0;
 
         // Setup
-        this.parser_actions = ['parse_variables', 'parse_includes', 'parse_if', 'parse_foreach'];
+        this.parser_actions = ['parse_foreach', 'parse_variables', 'parse_includes', 'parse_if'];
         this.parser_actions_completed = 0;
 
         // Raw source
@@ -45,7 +45,8 @@ module.exports = class Parser {
                         if(this.errors.length == 0){
                             resolve({
                                 require_another_pass: this.require_parse,
-                                source: this.raw_source
+                                source: this.raw_source,
+                                data_layer: this.data_layer
                             });
                         }else{
                             reject(this.errors);
@@ -81,18 +82,69 @@ module.exports = class Parser {
                     // Get variable name
                     let var_name = item.toString().replace('{{','').replace('}}','').trim()
 
+                    // Get depth level
+                    var var_depth = var_name.split(".").length;
+
+                    console.log("Var = ", var_name, "depth = ", var_depth);
+
                     // Check the variable is in the data layer
                     try {
 
-                        if('undefined' !== typeof this.data_layer[var_name]){
+                        if(var_depth <= 1){
 
-                            // Replace
-                            this.raw_source = this.raw_source.replace(item, decodeURIComponent(this.data_layer[var_name]));
+                            if('undefined' !== typeof this.data_layer[var_name]){
+
+                                // Replace
+                                this.raw_source = this.raw_source.replace(item, decodeURIComponent(this.data_layer[var_name]));
+
+                            }else{
+
+                                // Replace with nothing
+                                this.raw_source = this.raw_source.replace(item, '');
+
+                            }
 
                         }else{
 
-                            // Replace with nothing
-                            this.raw_source = this.raw_source.replace(item, '');
+                            // Var value
+                            let var_value = null;
+
+                            // Hold temp whilst we iterate
+                            let temp_var = this.data_layer;
+                            console.log(temp_var.article);
+
+                            // Get the individual ports
+                            let var_parts = var_name.split('.');
+
+                            // Iterate
+                            for (let i = 0; i < var_depth; i++) {
+
+                                // Get the current var to look for
+                                let current = var_parts[0];
+
+                                // Check if we have it in our temp_var (starts of as data_layer)
+                                if('undefined' !== typeof temp_var[current]){
+
+                                    // Set temp var to current variable
+                                    temp_var = temp_var[current];
+
+                                    // Shift the array one to the left
+                                    var_parts.shift();
+
+                                    console.log(i, var_depth);
+
+                                    // Check if last in tree
+                                    if( i == (var_depth-1) ){
+                                        console.log("SET");
+                                        var_value = temp_var;
+                                    }
+
+                                }
+
+                            }
+
+                            // Replace
+                            this.raw_source = this.raw_source.replace(item, var_value);
 
                         }
 
@@ -258,17 +310,17 @@ module.exports = class Parser {
                                 //foreach_local.index = i;
 
                                 _fibre_app_html += to_parse_on_iteration;
-                                //console.log(foreach_local.value);
+                                this.data_layer[ite_var_name] = element;
 
                             });
+
+                            this.require_parse = 1;
 
                             // Replace
                             this.raw_source = this.raw_source.replace(statement, to_parse_on_iteration);
                             this.raw_source = this.raw_source.replace(to_parse_on_iteration, _fibre_app_html);
 
                         })(this.data_layer);
-
-                        //this.require_parse = 1;
 
                     } catch (error) {
                         console.log(error);
@@ -277,6 +329,7 @@ module.exports = class Parser {
                 });
             }
 
+            // Require parse
             resolve();
 
         });
