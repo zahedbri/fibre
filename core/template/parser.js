@@ -245,7 +245,6 @@ module.exports = class Parser {
                         let _fibre_app_html = ((dl) => {
 
                             return eval("(() => {" + to_parse_on_iteration + "})();");
-                            console.log(_fibre_app_html);
 
                         })(this.data_layer);
 
@@ -253,7 +252,7 @@ module.exports = class Parser {
                         this.raw_source = this.raw_source.replace(statement, _fibre_app_html);
 
                     } catch (error) {
-                        console.log(error);
+                        reject("Error in user's code.");
                     }
 
                 });
