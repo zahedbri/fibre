@@ -85,8 +85,6 @@ module.exports = class Parser {
                     // Get depth level
                     var var_depth = var_name.split(".").length;
 
-                    console.log("Var = ", var_name, "depth = ", var_depth);
-
                     // Check the variable is in the data layer
                     try {
 
@@ -103,48 +101,6 @@ module.exports = class Parser {
                                 this.raw_source = this.raw_source.replace(item, '');
 
                             }
-
-                        }else{
-
-                            // Var value
-                            let var_value = null;
-
-                            // Hold temp whilst we iterate
-                            let temp_var = this.data_layer;
-                            console.log(temp_var.article);
-
-                            // Get the individual ports
-                            let var_parts = var_name.split('.');
-
-                            // Iterate
-                            for (let i = 0; i < var_depth; i++) {
-
-                                // Get the current var to look for
-                                let current = var_parts[0];
-
-                                // Check if we have it in our temp_var (starts of as data_layer)
-                                if('undefined' !== typeof temp_var[current]){
-
-                                    // Set temp var to current variable
-                                    temp_var = temp_var[current];
-
-                                    // Shift the array one to the left
-                                    var_parts.shift();
-
-                                    console.log(i, var_depth);
-
-                                    // Check if last in tree
-                                    if( i == (var_depth-1) ){
-                                        console.log("SET");
-                                        var_value = temp_var;
-                                    }
-
-                                }
-
-                            }
-
-                            // Replace
-                            this.raw_source = this.raw_source.replace(item, var_value);
 
                         }
 
@@ -272,55 +228,29 @@ module.exports = class Parser {
         return new Promise((resolve, reject) => {
 
             // Include statements
-            let foreach_statements = this.raw_source.match(new RegExp(/(@foreach)(\()([a-zA-Z]+)\s(in)\s([a-zA-Z.]+)(\))([\s\S]*?)(@endforeach)/g));
+            let foreach_statements = this.raw_source.match(new RegExp(/(@fibre)([\s\S]*?)(@endfibre)/g));
 
             // Iterate
             if('undefined' !== typeof foreach_statements && Array.isArray(foreach_statements) && foreach_statements.length > 0){
                 foreach_statements.forEach(statement => {
 
                     // Get groups
-                    let match_groups = statement.match(/(@foreach)(\()([a-zA-Z]+)\s(in)\s([a-zA-Z.]+)(\))([\s\S]*?)(@endforeach)/);
+                    let match_groups = statement.match(/(@fibre)([\s\S]*?)(@endfibre)/);
 
-                    // Iterator variable name
-                    const ite_var_name = match_groups[3].toString().trim();
-
-                    // List var in data layer
-                    const ite_list = match_groups[5].toString().trim();
-
-                    // Parse the contents of group 7
-                    const to_parse_on_iteration = match_groups[7].toString();
+                    // Parse the contents
+                    const to_parse_on_iteration = match_groups[2].toString();
 
                     try {
 
-                        ((dl) => {
+                        let _fibre_app_html = ((dl) => {
 
-                            // Get the list
-                            var foreach_local = {
-                                list: eval("dl." + ite_list),
-                                value: null,
-                                index: -1
-                            }
-
-                            // Declare html var
-                            let _fibre_app_html = '';
-
-                            foreach_local.list.forEach((element, i) => {
-
-                                //foreach_local.value = element;
-                                //foreach_local.index = i;
-
-                                _fibre_app_html += to_parse_on_iteration;
-                                this.data_layer[ite_var_name] = element;
-
-                            });
-
-                            this.require_parse = 1;
-
-                            // Replace
-                            this.raw_source = this.raw_source.replace(statement, to_parse_on_iteration);
-                            this.raw_source = this.raw_source.replace(to_parse_on_iteration, _fibre_app_html);
+                            return eval("(() => {" + to_parse_on_iteration + "})();");
+                            console.log(_fibre_app_html);
 
                         })(this.data_layer);
+
+                        // Replace
+                        this.raw_source = this.raw_source.replace(statement, _fibre_app_html);
 
                     } catch (error) {
                         console.log(error);
