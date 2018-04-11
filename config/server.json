@@ -2,8 +2,8 @@
     "websites": {
         "default": {
             "name": "My default website",
-            "website_root": "c:\\fibreweb\\",
-            "document_root": "c:\\fibreweb\\public\\",
+            "website_root": "c:\\fibre-website\\",
+            "document_root": "c:\\fibre-website\\public\\",
             "default_document": [".html"],
             "network": {
                 "bind_address": "0.0.0.0"

@@ -225,10 +225,10 @@ module.exports = class Parser {
             // Iterate
             if('undefined' !== typeof foreach_statements && Array.isArray(foreach_statements) && foreach_statements.length > 0){
                 foreach_statements.forEach(statement => {
-                    
+
                     // Get groups
                     let match_groups = statement.match(/(@foreach)(\()([a-zA-Z]+)\s(in)\s([a-zA-Z.]+)(\))([\s\S]*?)(@endforeach)/);
-                    
+
                     // Iterator variable name
                     const ite_var_name = match_groups[3].toString().trim();
 
@@ -243,21 +243,36 @@ module.exports = class Parser {
                         ((dl) => {
 
                             // Get the list
-                            var list = eval(ite_list);
+                            var foreach_local = {
+                                list: eval("dl." + ite_list),
+                                value: null,
+                                index: -1
+                            }
 
-                            list.forEach((element, i) => {
-                                
-                                eval(ite_var_name + '= 1;');
+                            // Declare html var
+                            let _fibre_app_html = '';
 
-                                console.log(eval(ite_var_name));
+                            foreach_local.list.forEach((element, i) => {
+
+                                //foreach_local.value = element;
+                                //foreach_local.index = i;
+
+                                _fibre_app_html += to_parse_on_iteration;
+                                //console.log(foreach_local.value);
 
                             });
 
-                        })(this.data_layer);                    
+                            // Replace
+                            this.raw_source = this.raw_source.replace(statement, to_parse_on_iteration);
+                            this.raw_source = this.raw_source.replace(to_parse_on_iteration, _fibre_app_html);
 
-                    } catch (error) {                        
+                        })(this.data_layer);
+
+                        //this.require_parse = 1;
+
+                    } catch (error) {
                         console.log(error);
-                    }                    
+                    }
 
                 });
             }
