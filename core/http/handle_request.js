@@ -88,6 +88,14 @@ module.exports = class HandleRequest {
 
                             }
 
+                            // Set vary header
+                            if(['js','css','xml','gz','html'].indexOf(file.extension) > -1){
+                                response.setHeader("Vary", "Accept-Encoding");
+                                response.setHeader("Cache-Control", "max-age=604800, public");
+                                response.setHeader('Last-Modified', route_data.last_modified);
+                                response.setHeader('Expires', new Date().setFullYear(new Date().getFullYear() + 1));
+                            }
+
                             // Set Status Code
                             response.writeHead(200);
 
@@ -98,12 +106,13 @@ module.exports = class HandleRequest {
                             const md5_of_path = crypto.createHash('md5').update(route_data.url).digest('hex');
 
                             // Add to cache
-                            global._fibre_app.cache[md5_of_path] = {
+                            // Disabled cache for now.
+                            /*global._fibre_app.cache[md5_of_path] = {
                                 route_data: route_data,
                                 content_type: file.content_type,
                                 encoding: file.encoding,
                                 data: data.toString()
-                            };
+                            };*/
 
                         }
                     });

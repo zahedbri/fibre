@@ -9,7 +9,7 @@
                 "bind_address": "0.0.0.0"
             },
             "http": {
-                "port": 3000,
+                "port": 80,
                 "enabled": true
             },
             "https": {
