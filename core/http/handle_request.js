@@ -90,7 +90,6 @@ module.exports = class HandleRequest {
 
                             // Set vary header
                             if(['js','css','xml','gz','html'].indexOf(file.extension) > -1){
-                                response.setHeader("Vary", "Accept-Encoding");
                                 response.setHeader("Cache-Control", "max-age=604800, public");
                                 response.setHeader('Last-Modified', route_data.last_modified);
                                 response.setHeader('Expires', new Date().setFullYear(new Date().getFullYear() + 1));

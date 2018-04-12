@@ -31,6 +31,9 @@ if [ -d "fibre" ]; then
         # Copy node_modules
         cp -R fibre/node_modules/. node_modules/
 
+        # Copy version file
+        cp fibre/version.txt version.txt
+
 fi
 
 # Remove fibre folder
