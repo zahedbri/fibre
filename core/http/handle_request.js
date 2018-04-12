@@ -37,7 +37,7 @@ module.exports = class HandleRequest {
         const client_ip = request.connection.remoteAddress || null;
 
         // Get URL parts
-        const url_parts = url.parse(request.url);
+        const url_parts = url.parse(request.url, true);
 
         // Log
         console.log(`-> Handling request from ${client_ip} for website "${website.name}".`);

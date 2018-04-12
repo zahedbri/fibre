@@ -129,8 +129,20 @@ module.exports = class Router {
                     // Get url
                     const route_url = route.url.toString().toLowerCase().trim();
 
+                    // Get script name
+                    var path_name_split = this.url_parts.pathname.toString().split('/') || [''];
+
                     // Add the data layer
-                    route['data_layer'] = {};
+                    route['data_layer'] = {
+                        PATHNAME: this.url_parts.pathname,
+                        PATH: this.url_parts.path,
+                        SEARCH: this.url_parts.search,
+                        QUERY: this.url_parts.query,
+                        PROTOCOL: this.url_parts.protocol,
+                        HOST: this.url_parts.host,
+                        PORT: this.url_parts.port,
+                        SCRIPT_NAME: path_name_split[path_name_split.length - 1].toString()
+                    };
 
                     // Route Match
                     if(route_url == this.url_parts.pathname){
