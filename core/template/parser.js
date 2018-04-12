@@ -1,3 +1,5 @@
+import { parse } from 'path';
+
 "use strict";
 
 // Require modules
@@ -58,6 +60,7 @@ module.exports = class Parser {
 
                     // Log
                     console.log(parse_error);
+                    reject(parse_error);
 
                 });
             });
@@ -211,7 +214,6 @@ module.exports = class Parser {
 
                         } catch (error) {
                             this.raw_source = this.raw_source.replace(if_statement, '');
-                            console.log(error);
                         }
 
                     }
