@@ -67,7 +67,7 @@ module.exports = class Router {
         return new Promise((resolve, reject) => {
 
             // Create MD5 hash of path
-            const md5_of_path = crypto.createHash('md5').update(this.url_parts.path).digest('hex');
+            const md5_of_path = crypto.createHash('md5').update(this.url_parts.pathname).digest('hex');
 
             // Check
             if(global._fibre_app.cache[md5_of_path]){
@@ -87,14 +87,15 @@ module.exports = class Router {
         return new Promise((resolve, reject) => {
 
             // Direct File match
-            fs.stat( this.website.document_root + this.url_parts.path, (err, stats) => {
+            fs.stat( this.website.document_root + this.url_parts.pathname, (err, stats) => {
                 if(!err && stats.isFile()){
 
                     // Build the route as a file does not have one
                     let route = {
-                        url: this.url_parts.path,
+                        url: this.url_parts.pathname,
                         is_file: true,
-                        location: this.website.document_root + this.url_parts.path
+                        location: this.website.document_root + this.url_parts.pathname,
+                        last_modified:  new Date(stats.mtime)
                     };
 
                     // Resolve
