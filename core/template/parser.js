@@ -1,5 +1,3 @@
-import { parse } from 'path';
-
 "use strict";
 
 // Require modules
