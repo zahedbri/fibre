@@ -16,9 +16,9 @@ parts:
     node-packages: [fs-extra]
     install: |
       snapdir=$(pwd)
-      echo "Snap Common = $SNAP_COMMON"
-      mkdir -p "$SNAP_COMMON/config"
-      cp -n "$snapdir/config/server.json" "$SNAP_COMMON/config/server.json"
+      echo "Snap Common = $SNAP_DATA"
+      mkdir -p "$SNAP_DATA/config"
+      cp -n "$snapdir/config/server.json" "$SNAP_DATA/config/server.json"
 
 apps:
   server:
