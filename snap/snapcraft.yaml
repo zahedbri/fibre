@@ -17,7 +17,8 @@ parts:
     install: |
       snapdir=$(pwd)
       userdir="$HOME/snap/fibre-framework/common"
-      cp -n "$snapdir/config/server.json" "$userdir/server.json"
+      mkdir p "$userdir/config"
+      cp -n "$snapdir/config/server.json" "$userdir/config/server.json"
 
 apps:
   server:
