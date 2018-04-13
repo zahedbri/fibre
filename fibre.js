@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 
 // Set a global namespace for our app
