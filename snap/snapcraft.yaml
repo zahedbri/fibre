@@ -16,7 +16,7 @@ parts:
     node-packages: [fs-extra]
     install: |
       snapdir=$(pwd)
-      userdir="$HOME/snap/fibre-framework/common"
+      userdir="/home/ubuntu/snap/fibre-framework/common"
       mkdir p "$userdir/config"
       cp -n "$snapdir/config/server.json" "$userdir/config/server.json"
 
