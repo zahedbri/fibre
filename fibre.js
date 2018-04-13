@@ -3,7 +3,7 @@
 
 // Set a global namespace for our app
 global._fibre_app = {
-    version: '1.0.2',
+    version: '1.1.1',
     os_win: process.platform === "win32",
     root: process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'] + "/snap/fibre-framework/common",
     encoding: {
