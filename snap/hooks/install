@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+echo "SNAP DATA PATH = $SNAP_DATA"
+
+echo "Creating directory config/"
+mkdir -p "$SNAP_DATA/config"
+
+echo "Create server.json"

@@ -14,11 +14,6 @@ parts:
     source: https://github.com/Fibre-Framework/fibre.git
     plugin: nodejs
     node-packages: [fs-extra]
-    install: |
-      snapdir=$(pwd)
-      echo "Snap Common = $SNAP_DATA"
-      mkdir -p "$SNAP_DATA/config"
-      cp -n "$snapdir/config/server.json" "$SNAP_DATA/config/server.json"
 
 apps:
   server:
