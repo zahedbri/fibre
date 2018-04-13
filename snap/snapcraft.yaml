@@ -7,7 +7,7 @@ description: |
   thousands of clients simultaneously with ease.
 
 grade: stable
-confinement: classic
+confinement: strict
 
 parts:
   fibre:
