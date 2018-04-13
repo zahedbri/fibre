@@ -15,10 +15,9 @@ parts:
     plugin: nodejs
     node-packages: [fs-extra]
     install: |
-      mkdir -p /etc/fibre-framework/
-      mkdir -p /etc/fibre-framework/config/
       snapdir=$(pwd)
-      cp -n "$snapdir/config/server.json" /etc/fibre-framework/config/server.json
+      userdir="$HOME/snap/fibre-framework/common"
+      cp -n "$snapdir/config/server.json" "$userdir/server.json"
 
 apps:
   server:
