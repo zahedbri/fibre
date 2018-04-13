@@ -14,6 +14,7 @@ parts:
   fibre:
     source: .
     plugin: nodejs
+    node-packages: [fs-extra]
 
 apps:
   node-service:
