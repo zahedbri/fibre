@@ -13,7 +13,7 @@ module.exports = class Parser {
         this.require_parse = 0;
 
         // Setup
-        this.parser_actions = ['parse_foreach', 'parse_variables', 'parse_includes', 'parse_if'];
+        this.parser_actions = ['parse_fibre', 'parse_variables', 'parse_includes', 'parse_if'];
         this.parser_actions_completed = 0;
 
         // Raw source
@@ -199,7 +199,7 @@ module.exports = class Parser {
 
                             result = ((dl) => {
 
-                                return eval(if_to_evaulate);
+                                return eval("dl." + if_to_evaulate);
 
                             })(this.data_layer);
 
@@ -224,7 +224,7 @@ module.exports = class Parser {
         });
     }
 
-    parse_foreach(){
+    parse_fibre(){
         return new Promise((resolve, reject) => {
 
             // Include statements
