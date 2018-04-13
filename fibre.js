@@ -5,7 +5,7 @@
 global._fibre_app = {
     version: '1.1.1',
     os_win: process.platform === "win32",
-    root: process.env[(process.platform == 'win32') ? 'USERPROFILE' : '/var/snap/fibre-framework/common'],
+    root: '/var/snap/fibre-framework/common',
     encoding: {
         text: "utf8"
     },
@@ -70,7 +70,7 @@ new StartupCheck().then(( args ) => {
                     // Check if directoy provided
                     if(arg.toString().trim() !== ''){
 
-                        const project_path = arg.toString().trim();
+                        const project_path = global._fibre_app.root + '/sites/' + arg.toString().trim();
 
                         // Check if directory exists, if not create
                         fs.stat(project_path, (err, stats) => {

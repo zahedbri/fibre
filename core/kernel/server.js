@@ -141,7 +141,7 @@ module.exports = class Server {
                                         try {
 
                                             // Test read access
-                                            var dir_exists = fs.statSync( website.document_root.toString() ).isDirectory();
+                                            var dir_exists = fs.statSync( global._fibre_app.root + '/sites/' + website.document_root.toString() ).isDirectory();
 
                                             // Load the routes
                                             new RouteLoader(website).then((routes) => {
