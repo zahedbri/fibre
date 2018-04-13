@@ -24,5 +24,4 @@ apps:
   server:
     command: bin/fibre-framework
     daemon: simple
-    restart-condition: always
-    plugs: [network-bind]
+    plugs: [network, network-bind]
