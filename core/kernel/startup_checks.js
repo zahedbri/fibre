@@ -22,6 +22,7 @@ module.exports = class StartupCheck {
             // Attempt to get configuration file
             fs.readFile( global._fibre_app.root + 'config/server.json', global._fibre_app.encoding.text,function(err, data){
                 if(err){
+                    console.log(err);
                     reject('No "server.json" file was found, please make sure this file exists before running Fibre.');
                 }
 
