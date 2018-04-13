@@ -5,6 +5,7 @@
 global._fibre_app = {
     version: '1.0.2',
     os_win: process.platform === "win32",
+    root: process.platform === "win32" ? 'c:\\Program Files\\Fibre Framework\\' : '/etc/fibre-framework/fibre/',
     encoding: {
         text: "utf8"
     },
