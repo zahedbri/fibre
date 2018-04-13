@@ -3,36 +3,19 @@
 [![Snap Status](https://build.snapcraft.io/badge/Fibre-Framework/fibre.svg)](https://build.snapcraft.io/user/Fibre-Framework/fibre)
 
 # Installation
-You only need to install fibre once, you should then update Fibre using the instructions [here](#updating).
 
-1. Navigate to the directory where you would like to install Fibre, we will be using */etc/fibre*.
-2. Clone this repository using the following command.
+Run the following command to install via Ubuntu Snap.
 
-```bash
-git clone https://github.com/mrbenosborne/fibre.git .
 ```
-
-3. Make the *install.sh* and *update.sh* scripts executable by running the following command.
-
-```bash
-sudo chmod +x /etc/fibre/install.sh
-sudo chmod +x /etc/fibre/update.sh
-```
-
-4. Run the install script.
-
-```bash
-sudo sh /etc/fibre/install.sh
+sudo snap install fibre-framework
 ```
 
 # Updating
 
-1. Navigate to the directory where you would like to install Fibre, we will be using */etc/fibre*.
+Run the following command.
 
-2. Run the update script.
-
-```bash
-sudo sh /etc/fibre/update.sh
+```
+sudo snap refresh fibre-framework
 ```
 
 # Create an empty project

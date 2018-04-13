@@ -21,6 +21,8 @@ parts:
       cp -n "$snapdir/config/server.json" /etc/fibre-framework/config/server.json
 
 apps:
-  node-service:
+  server:
     command: bin/fibre-framework
+    daemon: simple
+    restart-condition: always
     plugs: [network-bind]
