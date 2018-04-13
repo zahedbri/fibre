@@ -4,5 +4,8 @@
     "description": "Event Driven | Web Server | NodeJS | Framework",
     "license": "GNU",
     "private": true,
-    "bin": "./fibre.js"
+    "bin": "./fibre.js",
+    "dependencies": {
+        "fs-extra": "^5.0.0"
+    }
 }
