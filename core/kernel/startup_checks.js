@@ -17,7 +17,7 @@ module.exports = class StartupCheck {
         return new Promise((resolve, reject) => {
 
             // Log
-            console.log('-> Attempting to open file "' + global._fibre_app.root + '/config/server.json' + '" for reading...');
+            console.log('-> Attempting to open file "' + global._fibre_app.root + 'config/server.json' + '" for reading...');
 
             // Attempt to get configuration file
             fs.readFile( global._fibre_app.root + '/config/server.json', global._fibre_app.encoding.text,function(err, data){
@@ -92,9 +92,6 @@ module.exports = class StartupCheck {
         // Set class variables
         this.arguments = [];
 
-        // Current working directory
-        this.root = require('path').dirname(require.main.filename);
-
         // Return a promise
         return new Promise((resolve, reject) => {
 
@@ -104,9 +101,6 @@ module.exports = class StartupCheck {
                     this.arguments.push(val);
                 });
             }
-
-            // Add root to global
-            global._fibre_app['root'] = this.root;
 
             // Handle arguments
             console.log('-> Handling arguments...');
