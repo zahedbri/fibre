@@ -1,5 +1,7 @@
 # Fibre
 
+[![Snap Status](https://build.snapcraft.io/badge/Fibre-Framework/fibre.svg)](https://build.snapcraft.io/user/Fibre-Framework/fibre)
+
 # Installation
 You only need to install fibre once, you should then update Fibre using the instructions [here](#updating).
 
