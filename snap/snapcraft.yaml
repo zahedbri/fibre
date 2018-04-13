@@ -14,9 +14,6 @@ parts:
     source: https://github.com/Fibre-Framework/fibre.git
     plugin: nodejs
     node-packages: [fs-extra]
-    install: |
-      snapdir=$(pwd)
-      chmod a+x "$snapdir/snap/hooks/install"
 
 apps:
   server:

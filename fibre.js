@@ -23,6 +23,7 @@ global._fibre_app = {
 };
 
 console.log(global._fibre_app);
+console.log(process.env);
 
 // Setup a list of arguments that will bypass server start
 const arguments_bypass_server_boot = ['version', 'v', 'create-project'];
