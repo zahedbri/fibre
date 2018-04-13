@@ -20,3 +20,7 @@ apps:
     command: bin/fibre-framework
     daemon: simple
     plugs: [network, network-bind]
+
+hooks:
+  install:
+    plugs: [home, network]
