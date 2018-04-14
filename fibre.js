@@ -22,7 +22,8 @@ global._fibre_app = {
     }
 };
 
-console.log(process.env.SNAP_USER_COMMON);
+console.log("LOOK HERE")
+console.log(process.env.SNAP_USER_DATA);
 
 // Setup a list of arguments that will bypass server start
 const arguments_bypass_server_boot = ['version', 'v', 'create-project'];

@@ -1,10 +1,4 @@
 #!/bin/sh
 set -e
 
-# CONFIG FILE PATH
-CONFIG_FILE=$SNAP_USER_COMMON/config
-
-echo "Creating configuration folder ->"
-echo $CONFIG_FILE
-
-mkdir -p $CONFIG_FILE
+echo "sleep_time 5" > "$SNAP_DATA/hello.conf"
