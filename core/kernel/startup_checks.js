@@ -17,8 +17,7 @@ module.exports = class StartupCheck {
         return new Promise((resolve, reject) => {
 
             // Log
-            console.log('-> Path is ' + process.env.SNAP_DATA);
-            console.log('-> Attempting to open file "' + global._fibre_app.root + '/server.json' + '" for reading...');
+            console.log('-> Attempting to open server.json "' + global._fibre_app.root + '/server.json' + '" for reading...');
 
             // Attempt to get configuration file
             fs.readFile( global._fibre_app.root + '/server.json', global._fibre_app.encoding.text,function(err, data){
@@ -105,7 +104,7 @@ module.exports = class StartupCheck {
             }
 
             // Handle arguments
-            console.log('-> Handling arguments...');
+            console.log('-> Reading arguments...');
             let handled_arguments = this.HandleArguments();
 
             // Get the server configuration

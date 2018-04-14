@@ -203,7 +203,10 @@ module.exports = class HandleRequest {
      * Display HTTP Error
      * @param {*} file_contents
      */
-    display_http_error(http_code = 500, file_contents = ""){
+    display_http_error(http_code, file_contents){
+
+        http_code = http_code || 500;
+        file_contents = file_contents || '';
 
         // Switch on HTTP Code
         switch(http_code){

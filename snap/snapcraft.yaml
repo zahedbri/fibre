@@ -11,7 +11,7 @@ confinement: strict
 
 parts:
   fibre:
-    source: .
+    source: https://github.com/Fibre-Framework/fibre.git
     plugin: nodejs
     node-packages: [fs-extra]
 
@@ -21,7 +21,7 @@ apps:
     daemon: simple
     plugs: [network, network-bind]
   manage:
-    command: bin/fibre-framework
+    command: bin/fibre-framework manage
 
 hooks:
   install:
