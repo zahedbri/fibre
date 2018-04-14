@@ -88,14 +88,14 @@ module.exports = class Router {
         return new Promise((resolve, reject) => {
 
             // Direct File match
-            fs.stat( this.website.document_root + this.url_parts.pathname, (err, stats) => {
+            fs.stat( global._fibre_app.root + '/sites/' + this.website.document_root + this.url_parts.pathname, (err, stats) => {
                 if(!err && stats.isFile()){
 
                     // Build the route as a file does not have one
                     let route = {
                         url: this.url_parts.pathname,
                         is_file: true,
-                        location: this.website.document_root + this.url_parts.pathname,
+                        location: global._fibre_app.root + '/sites/' + this.website.document_root + this.url_parts.pathname,
                         last_modified:  new Date(stats.mtime)
                     };
 
