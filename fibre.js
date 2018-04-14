@@ -22,6 +22,8 @@ global._fibre_app = {
     }
 };
 
+console.log(`Version -> ${global._fibre_app.version}`);
+
 // Setup a list of arguments that will bypass server start
 const arguments_bypass_server_boot = ['manage','version', 'v', 'create-website'];
 let bypass = false;
