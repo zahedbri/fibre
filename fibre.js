@@ -5,7 +5,7 @@
 global._fibre_app = {
     version: '1.1.1',
     os_win: process.platform === "win32",
-    root: process.env.SNAP_USER_COMMON,
+    root: process.env.SNAP_USER_DATA,
     encoding: {
         text: "utf8"
     },
@@ -21,9 +21,6 @@ global._fibre_app = {
         post: 0
     }
 };
-
-console.log("LOOK HERE")
-console.log(process.env.SNAP_USER_DATA);
 
 // Setup a list of arguments that will bypass server start
 const arguments_bypass_server_boot = ['version', 'v', 'create-project'];

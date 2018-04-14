@@ -1,4 +1,35 @@
 #!/bin/sh
 set -e
 
-echo "sleep_time 5" > "$SNAP_DATA/hello.conf"
+echo "Writing server.json file if it does not exist."
+
+cat <<\EOT >"$SNAP_DATA/server.json"
+{
+    "websites": {
+        "default": {
+            "name": "My default website",
+            "website_root": "/my-website/",
+            "document_root": "/my-website/public/",
+            "default_document": [".html"],
+            "network": {
+                "bind_address": "0.0.0.0"
+            },
+            "http": {
+                "port": 80,
+                "enabled": true
+            },
+            "https": {
+                "port": 443,
+                "certificate_path": "/certs/",
+                "enabled": false
+            },
+            "extensions": {
+
+            }
+        }
+    }
+}
+EOT
+
+echo "Create the sites folder..."
+mkdir -p "$SNAP_DATA/sites/"
