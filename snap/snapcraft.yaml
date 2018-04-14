@@ -11,7 +11,7 @@ confinement: strict
 
 parts:
   fibre:
-    source: .
+    source: https://github.com/Fibre-Framework/fibre.git
     plugin: nodejs
     node-packages: [fs-extra]
 
