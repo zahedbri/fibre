@@ -57,7 +57,7 @@ module.exports = class View {
             this.view_name = this.view.toString().replace(".","/");
 
             // Check if the view exists
-            fs.readFile( this.website.website_root + '/views/' + this.view_name + '.html', global._fibre_app.encoding.text, (err, data) => {
+            fs.readFile( global._fibre_app.root + '/sites/' + this.website.website_root + '/views/' + this.view_name + '.html', global._fibre_app.encoding.text, (err, data) => {
                 if(err){
                     reject(`The view "${this.view_name}" does not exist in ${this.website.website_root + '/views/'}.`);
                 }

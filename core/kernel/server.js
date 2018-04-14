@@ -38,8 +38,8 @@ module.exports = class Server {
 
                 // HTTPS Options
                 const options = {
-                    key: fs.readFileSync(website.website_root + '/config/' + website.https.certificate_path + 'private.key'),
-                    cert: fs.readFileSync(website.website_root + '/config/' + website.https.certificate_path + 'certificate.cert')
+                    key: fs.readFileSync(global._fibre_app.root + '/sites/' + website.website_root + '/config/' + website.https.certificate_path + 'private.key'),
+                    cert: fs.readFileSync(global._fibre_app.root + '/sites/' + website.website_root + '/config/' + website.https.certificate_path + 'certificate.cert')
                 };
 
                 // Create the server

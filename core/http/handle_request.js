@@ -131,8 +131,8 @@ module.exports = class HandleRequest {
                  */
 
                 // Require the controller
-                delete require.cache[require.resolve(website.website_root + '/controllers/' + route_data.controller)];
-                let RouteController = require( website.website_root + '/controllers/' + route_data.controller );
+                delete require.cache[require.resolve(global._fibre_app.root + '/sites/' + website.website_root + '/controllers/' + route_data.controller)];
+                let RouteController = require(global._fibre_app.root + '/sites/' + website.website_root + '/controllers/' + route_data.controller );
 
                 // Start a new instance
                 let RouteControllerInstance = new RouteController(route_data.data_layer, ViewController, ResponseController, website);
@@ -228,7 +228,7 @@ module.exports = class HandleRequest {
         this.response.setHeader('Content-Type', 'text/html');
 
         // Check for a static file
-        fs.readFile( this.website.website_root + '/views/error/' + http_code.toString() + '.html', global._fibre_app.encoding.text, (err, data) => {
+        fs.readFile( global._fibre_app.root + '/sites/' + this.website.website_root + '/views/error/' + http_code.toString() + '.html', global._fibre_app.encoding.text, (err, data) => {
             if(err){
 
                 // File does not exist

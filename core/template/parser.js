@@ -141,7 +141,7 @@ module.exports = class Parser {
                         // Check if the view exists
                         try {
 
-                            let sub_view = fs.readFileSync( this.website.website_root + '/views/' + include_view_name + '.html', global._fibre_app.encoding.text);
+                            let sub_view = fs.readFileSync(global._fibre_app.root + '/sites/' + this.website.website_root + '/views/' + include_view_name + '.html', global._fibre_app.encoding.text);
 
                             // Replace
                             this.raw_source = this.raw_source.replace(include_statement, sub_view.toString(), 1);
