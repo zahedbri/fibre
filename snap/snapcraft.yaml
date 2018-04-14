@@ -14,6 +14,10 @@ parts:
     source: https://github.com/Fibre-Framework/fibre.git
     plugin: nodejs
     node-packages: [fs-extra]
+    prepare: |
+      current_dir=$(pwd)
+      echo "Current dir is $current_dir"
+      chmod +x snap/hooks/install
 
 apps:
   server:
