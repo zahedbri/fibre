@@ -2,3 +2,8 @@
 /sites/
 .DS_Store
 *.snap
+/parts/
+/prime/
+/stage/
+state
+*.tar.bz2

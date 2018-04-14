@@ -22,10 +22,8 @@ global._fibre_app = {
     }
 };
 
-console.log(global._fibre_app);
-
 // Setup a list of arguments that will bypass server start
-const arguments_bypass_server_boot = ['version', 'v', 'create-project'];
+const arguments_bypass_server_boot = ['manage','version', 'v', 'create-website'];
 let bypass = false;
 let arguments_arr = [];
 
@@ -44,10 +42,12 @@ new StartupCheck().then(( args ) => {
 
         // Check
         if('undefined' !== typeof args[arg]){
+
+            console.log("-> Bypassing server boot.");
             bypass = true;
         }
 
-    });
+    });    
 
     if(!bypass){
 
@@ -67,27 +67,36 @@ new StartupCheck().then(( args ) => {
                 const arg = args[key];
 
                 // Create Project
-                if(key == 'create-project'){
+                if(key == 'create-website'){
 
                     // Check if directoy provided
                     if(arg.toString().trim() !== ''){
 
                         const project_path = global._fibre_app.root + '/sites/' + arg.toString().trim();
 
+                        // Lognode
+                        console.log(`-> Creating a new website in "${project_path}".`);
+
                         // Check if directory exists, if not create
                         fs.stat(project_path, (err, stats) => {
                             if(err){
 
                                 // Create the directory
-                                fs.mkdir(project_path, (err) => {
+                                fs.ensureDir(project_path, (err) => {
                                     if(err){
-                                        console.log(`Failed to create directory at "${project_path}".`);
+                                        console.log(`-> Failed to create website directory at "${project_path}".`);
+                                        console.log(err);
+                                    }else{
+
+                                        console.log(`-> Created directory successfully.`);
+
                                     }
                                 });
 
                             }
 
                             // Copy
+                            console.log(`-> Copying over skeleton files...`);
                             fs.copy(require('path').dirname(require.main.filename) + '/core/storage/project-skeleton/', project_path).then(() => {
                                 console.log(`-> Successfully created your project at "${project_path}".`);
                             }).catch(err => {
