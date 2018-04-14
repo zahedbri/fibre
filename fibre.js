@@ -79,7 +79,7 @@ new StartupCheck().then(( args ) => {
                             if(err){
 
                                 // Create the directory
-                                fs.mkdir(path, (err) => {
+                                fs.mkdir(project_path, (err) => {
                                     if(err){
                                         console.log(`Failed to create directory at "${project_path}".`);
                                     }
