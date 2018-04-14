@@ -46,7 +46,7 @@ module.exports = class Server {
                 const server = https.createServer(options, (req, res) => {
 
                     // Set default headers
-                    res.setHeader('Server', 'Fibre/1.1.2');
+                    res.setHeader('Server', 'Fibre/1.2.0');
                     res.setHeader("Vary", "Accept-Encoding");
 
                     // Handle the request
@@ -75,7 +75,7 @@ module.exports = class Server {
                 const http_server = http.createServer((req, res) => {
 
                     // Set default headers
-                    res.setHeader('Server', 'Fibre/1.1.2');
+                    res.setHeader('Server', 'Fibre/1.2.0');
                     res.setHeader("Vary", "Accept-Encoding");
 
                     // Handle the request

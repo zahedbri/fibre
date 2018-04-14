@@ -38,7 +38,7 @@ module.exports = class HandleRequest {
         const client_ip = request.connection.remoteAddress || null;
 
         // Get URL parts
-        const url_parts = url.parse(request.url, true);
+        let url_parts = url.parse((is_ssl ? 'https': 'http') + '://' + request.headers.host + request.url, true);
 
         // Log
         console.log(`-> Handling request from ${client_ip} for website "${website.name}".`);
@@ -46,10 +46,37 @@ module.exports = class HandleRequest {
         // Send to the router
         new Router(url_parts, website).then((route_data) => {
 
-            /**
-             * Cache match
-             */
-            if('undefined' !== typeof route_data.is_cache && route_data.is_cache){
+            // Redirect
+            if('undefined' !== typeof route_data.is_redirect && route_data.is_redirect){
+
+                // Log
+                console.log(`-> Redirecting client.`);     
+                console.log(route_data);           
+
+                // Set to address
+                let redirect_to = route_data.item.to;
+                if(route_data.item.https === 'https'){
+                    if(url_parts.host !== null){
+                        redirect_to = 'https://' + url_parts.host + '/' + route_data.item.to;
+                    }
+                }
+
+                console.log(`-> Redirecting to URL: ${redirect_to}`);
+
+                // Set
+                response.setHeader("Location", redirect_to);
+
+                // Set Status Code
+                response.writeHead(route_data.item.code);
+
+                // Write data
+                response.end();
+
+            }else if('undefined' !== typeof route_data.is_cache && route_data.is_cache){
+
+                /**
+                 * Cache match
+                 */                
 
                 // Log
                 console.log(`-> Sending a cached response.`);

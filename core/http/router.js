@@ -4,6 +4,7 @@
 // Require modules
 const fs = require("fs");
 const crypto = require('crypto');
+const Redirects = require('../kernel/redirects');
 
 /**
  * Class: Router
@@ -25,31 +26,46 @@ module.exports = class Router {
             this.website = website;
             this.url_parts = url_parts;
 
-            // Check in cache
-            this.in_cache().then((cache_item) => {
+            // Log
+            console.log("-> Finding route..");
 
-                // Resolve
-                resolve(
-                    {
-                        is_cache: true,
-                        item: cache_item
-                    }
-                );
+            // Check redirects
+            new Redirects(website, url_parts).then((redirect_data) => {
+                
+                resolve({
+                    is_redirect: true,
+                    item: redirect_data
+                });
 
             }).catch(() => {
 
-                // Find object
-                this.find_object().then((route_data) => {
-                    resolve(route_data);
+                // Check in cache
+                this.in_cache().then((cache_item) => {
+
+                    // Resolve
+                    resolve(
+                        {
+                            is_cache: true,
+                            item: cache_item
+                        }
+                    );
+
                 }).catch(() => {
 
-                    // Find route
-                    this.find_route().then((route_data) => {
+                    // Find object
+                    this.find_object().then((route_data) => {
                         resolve(route_data);
                     }).catch(() => {
 
-                        // Reject
-                        reject({http_code: 404, message: ''});
+                        // Find route
+                        this.find_route().then((route_data) => {
+                            resolve(route_data);
+                        }).catch(() => {
+
+                            // Reject
+                            reject({http_code: 404, message: ''});
+
+                        });
 
                     });
 
