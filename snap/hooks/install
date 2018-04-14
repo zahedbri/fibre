@@ -9,8 +9,8 @@ cat > "$SNAP_DATA/server.json" << EOL
     "websites": {
         "default": {
             "name": "My default website",
-            "website_root": "/my-website/",
-            "document_root": "/my-website/public/",
+            "website_root": "my-website/",
+            "document_root": "my-website/public/",
             "default_document": [".html"],
             "network": {
                 "bind_address": "0.0.0.0"

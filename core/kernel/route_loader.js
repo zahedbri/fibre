@@ -20,12 +20,12 @@ module.exports = class RouteLoader {
             let routes = [];
 
             // Read file
-            fs.readFile( website.website_root + '/config/routes.json', global._fibre_app.encoding.text, function(err, data){
+            fs.readFile( global._fibre_app.root + '/sites/' + website.website_root + '/config/routes.json', global._fibre_app.encoding.text, function(err, data){
                 if(err){
 
-                    console.log("-> Error opening routes.json: ", error);
+                    console.log("-> Error opening routes.json: ", err);
 
-                    reject(error);
+                    reject(err);
                 }
 
                 // Try and decode
