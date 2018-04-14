@@ -2,8 +2,9 @@
 set -e
 
 echo "Writing server.json file if it does not exist."
+echo "sleep_time 5" > "$SNAP_DATA/server.json"
 
-cat <<\EOT >"$SNAP_DATA/server.json"
+cat > "$SNAP_DATA/server.json" << EOL
 {
     "websites": {
         "default": {
@@ -29,7 +30,7 @@ cat <<\EOT >"$SNAP_DATA/server.json"
         }
     }
 }
-EOT
+EOL
 
 echo "Create the sites folder..."
 mkdir -p "$SNAP_DATA/sites/"
