@@ -17,7 +17,7 @@ module.exports = class StartupCheck {
         return new Promise((resolve, reject) => {
 
             // Log
-            console.log('-> Path is ' + process.env.SNAP_USER_DATA);
+            console.log('-> Path is ' + process.env.SNAP_DATA);
             console.log('-> Attempting to open file "' + global._fibre_app.root + '/server.json' + '" for reading...');
 
             // Attempt to get configuration file
