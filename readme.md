@@ -20,13 +20,23 @@ sudo snap refresh fibre-framework
 
 # Create an empty project
 
-Once Fibre is installed you can run the following command to create a blank project.
+Once Fibre is installed you can **cd** to /var/snap/fibre-framework/current/sites/, create a new directory where you want your website to be hosted, download the project skeleton from:
 
-```bash
-sudo node /etc/fibre/fibre.js create-project=/var/web/
+```
+https://github.com/Fibre-Framework/fibre/tree/master/core/storage/project-skeleton
 ```
 
-The following command will create an empty project in the directory */var/web*.
+and place all the files inside your new website directory for example:
+
+```
+/var/snap/fibre-framework/current/sites/my-website/
+```
+
+Next, edit your server.json file to refelect your new website directory, you can edit the file at:
+
+```
+sudo nano /var/snap/fibre-framework/current/server.json
+```
 
 # Server Settings
 Before you start the Fibre server make sure you have changed or checked over the server settings, you can find all these settings in a JSON file located at */etc/fibre/config/server.json*.
