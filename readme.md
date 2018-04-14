@@ -36,13 +36,19 @@ Before you start the Fibre server make sure you have changed or checked over the
 You can start the fibre server using the command below.
 
 ```bash
-sudo node /etc/fibre/fibre.js
+sudo systemctl start snap.fibre-framework.server
 ```
 
-or to leave the server running and disconnect from the terminal:
+# Stopping the server
 
 ```bash
-sudo node /etc/fibre/fibre.js &
+sudo systemctl stop snap.fibre-framework.server
+```
+
+# Checking the status of the server
+
+```bash
+sudo systemctl status snap.fibre-framework.server
 ```
 
 with the above command you can press *Ctrl + C* to release from the terminal, leaving the server to run in the background.
@@ -50,9 +56,5 @@ with the above command you can press *Ctrl + C* to release from the terminal, le
 # Read the manual
 Now you have Fibre Framework setup you should head over to [Fibre Framework's](http://fibreframework.com/) website and read the manual.
 
-### Other command line commands
-* "v" or "version" - Display's the current version of Fibre.
-
 ### Operating Systems Supported
-* UNIX
-* Windows
+* Ubuntu/Linux via Snap
