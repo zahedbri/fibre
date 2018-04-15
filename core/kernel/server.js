@@ -47,7 +47,6 @@ module.exports = class Server {
 
                     // Set default headers
                     res.setHeader('Server', 'Fibre/1.2.0');
-                    res.setHeader("Vary", "Accept-Encoding");
 
                     // Handle the request
                     new HandleRequest(website, req, res, true);
@@ -76,7 +75,6 @@ module.exports = class Server {
 
                     // Set default headers
                     res.setHeader('Server', 'Fibre/1.2.0');
-                    res.setHeader("Vary", "Accept-Encoding");
 
                     // Handle the request
                     try {
