@@ -41,23 +41,22 @@ module.exports = class HandleRequest {
         let url_parts = url.parse((is_ssl ? 'https': 'http') + '://' + request.headers.host + request.url, true);
 
         // Log
-        console.log(`-> Handling request from ${client_ip} for website "${website.name}".`);
+        console.log(`-> Handling request "${request.url}" from "${client_ip}" for website "${website.name}".`);
 
         // Send to the router
         new Router(url_parts, website).then((route_data) => {
 
             // Redirect
-            if('undefined' !== typeof route_data.is_redirect && route_data.is_redirect){
+            if('undefined' !== typeof route_data.is_redirect && route_data.is_redirect === true){
 
                 // Log
-                console.log(`-> Redirecting client.`);     
-                console.log(route_data);           
+                console.log(`-> Redirecting client.`);            
 
                 // Set to address
                 let redirect_to = route_data.item.to;
                 if(route_data.item.https === 'https'){
                     if(url_parts.host !== null){
-                        redirect_to = 'https://' + url_parts.host + '/' + route_data.item.to;
+                        redirect_to = 'https://' + url_parts.host + route_data.item.to;
                     }
                 }
 
@@ -70,7 +69,7 @@ module.exports = class HandleRequest {
                 response.writeHead(route_data.item.code);
 
                 // Write data
-                response.end();
+                response.end();                
 
             }else if('undefined' !== typeof route_data.is_cache && route_data.is_cache){
 
@@ -153,6 +152,8 @@ module.exports = class HandleRequest {
 
             }else{
 
+                console.log(`-> RouteType = RouteMatch`);
+
                 /**
                  * Route Match
                  */
@@ -212,7 +213,7 @@ module.exports = class HandleRequest {
             }
 
             // Log
-            console.log(`-> Sending response for ${client_ip} for website "${website.name}".`);
+            console.log(`-> Sending response for ${client_ip} for website "${website.name}".`);            
 
         }).catch((router_error) => {
 

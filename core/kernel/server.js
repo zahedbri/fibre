@@ -79,15 +79,22 @@ module.exports = class Server {
                     res.setHeader("Vary", "Accept-Encoding");
 
                     // Handle the request
-                    new HandleRequest(website, req, res, false);
+                    try {
+                        new HandleRequest(website, req, res, false);   
+                    } catch (error) {
+                        console.log(`-> [ERROR] Request failed to process and respond to client.`);
+                        console.log(error);
+                    }                    
 
+                }).on('error', (e) => {
+                    console.log("-> HTTP Server Error: ", e);
                 });
 
                 // Listen for requests
                 http_server.listen(website.http.port, bind_address);
 
                 // Log
-                console.log(`-> Running HTTP.`);
+                console.log(`-> "${website.name}" OK.`);
 
             }
 

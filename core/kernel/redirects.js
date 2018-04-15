@@ -15,19 +15,31 @@ module.exports = class Redirects {
     constructor(website, url_parts){
         return new Promise((resolve, reject) => {
 
+            // Log
+            console.log(`-> Checking for redirects...`);
+
             // Get redirect file contents
             fs.stat(global._fibre_app.root + '/sites/' + website.website_root + '/config/redirects.conf',(err, stat) => {
-                if(err){
+                if(err){                
                     reject();
                 }else{
+
+                    // Log
+                    console.log(`-> Getting redirects...`);
 
                     // Get contents
                     if(new Date(stat.mtime).getTime() !== global._fibre_app.redirects_lm){
 
+                        // Log
+                        console.log(`-> Getting redirects from file...`);
+
                         // Get file
                         fs.readFile(global._fibre_app.root + '/sites/' + website.website_root + '/config/redirects.conf', global._fibre_app.encoding.text, (err, data) => {
                             if(err){
+
+                                console.log(`-> Failed to get redirects from file.`);
                                 reject();
+
                             }else{
 
                                 // Try / Catch
@@ -38,16 +50,20 @@ module.exports = class Redirects {
 
                                     // Iterate
                                     lines.forEach(line => {
-                                        
-                                        // Get parts
-                                        // x3
-                                        let redirect_part = line.split(" ",3);
-                                        redirects.push({
-                                            from: redirect_part[0],
-                                            to: redirect_part[1],
-                                            code: parseInt(redirect_part[2]),
-                                            https: redirect_part[3]
-                                        });
+
+                                        if(!line.match(/^#/g)){
+                                            
+                                            // Get parts
+                                            // x3
+                                            let redirect_part = line.split(" ",4);
+                                            redirects.push({
+                                                from: redirect_part[0],
+                                                to: redirect_part[1],
+                                                code: parseInt(redirect_part[2]),
+                                                https: redirect_part[3]
+                                            });
+
+                                        }
 
                                     });
 
@@ -59,12 +75,15 @@ module.exports = class Redirects {
 
                                     // Loop redirects
                                     redirects.forEach(redirect => {
+
                                         if(url_parts.pathname === redirect.from){
+
                                             resolve(redirect);
+
                                         }
                                     });
-            
-                                    reject();
+        
+                                    reject('The route did not match any redirects.');
 
                                 } catch (error) {
                                     console.log(`-> Failed to load redirects.`)
@@ -81,7 +100,9 @@ module.exports = class Redirects {
                         // Return cached version
                         global._fibre_app.redirects.forEach(redirect => {
                             if(url_parts.pathname === redirect.from){
+
                                 resolve(redirect);
+
                             }
                         });
 

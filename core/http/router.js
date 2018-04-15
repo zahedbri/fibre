@@ -32,12 +32,14 @@ module.exports = class Router {
             // Check redirects
             new Redirects(website, url_parts).then((redirect_data) => {
                 
+                console.log(`-> Redirecting client...`);
+
                 resolve({
                     is_redirect: true,
                     item: redirect_data
                 });
 
-            }).catch(() => {
+            }).catch((redirect_error) => {
 
                 // Check in cache
                 this.in_cache().then((cache_item) => {

@@ -58,9 +58,6 @@ new StartupCheck().then(( args ) => {
 
         new Server().then(() => {
 
-            // Log
-            console.log('-> Server running...');
-
         }).catch((server_error) => {
             console.error(server_error);
         });
