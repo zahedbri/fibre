@@ -3,6 +3,8 @@
 
 [![Snap Status](https://build.snapcraft.io/badge/Fibre-Framework/fibre.svg)](https://build.snapcraft.io/user/Fibre-Framework/fibre)
 
+[![Known Vulnerabilities](https://snyk.io/test/github/fibre-framework/fibre/badge.svg?targetFile=package.json)](https://snyk.io/test/github/fibre-framework/fibre?targetFile=package.json)
+
 # Installation
 
 ## Installing via Snap
