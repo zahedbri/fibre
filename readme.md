@@ -226,7 +226,7 @@ Your new website you created will have the path of:
 If you have a look inside your new website you will see the following structure:
 
 ```
-my-first-bloc
+my-first-blog
 └───config
 │   └───certs
 │
