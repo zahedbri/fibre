@@ -3,7 +3,7 @@
 
 // Set a global namespace for our app
 global._fibre_app = {
-    version: '1.1.1',
+    version: '1.2.0',
     os_win: process.platform === "win32",
     root: process.env.SNAP_DATA || require('path').dirname(require.main.filename),
     encoding: {
@@ -15,6 +15,8 @@ global._fibre_app = {
     server_configuration: {},
     sites: {},
     cache: [],
+    redirects: [],
+    redirects_lm: null,
     stats: {
         requests: 0,
         get: 0,
@@ -22,7 +24,8 @@ global._fibre_app = {
     }
 };
 
-console.log(`Version -> ${global._fibre_app.version}`);
+// Log
+console.log(`-> Fibre Framework: ${global._fibre_app.version}`);
 
 // Setup a list of arguments that will bypass server start
 const arguments_bypass_server_boot = ['manage','version', 'v', 'create-website'];
@@ -55,9 +58,6 @@ new StartupCheck().then(( args ) => {
 
         new Server().then(() => {
 
-            // Log
-            console.log('-> Server running...');
-
         }).catch((server_error) => {
             console.error(server_error);
         });
@@ -87,10 +87,10 @@ new StartupCheck().then(( args ) => {
                                 fs.ensureDir(project_path, (err) => {
                                     if(err){
                                         console.log(`-> Failed to create website directory at "${project_path}".`);
-                                        console.log(err);
+                                        console.log(`-> Try running the command with "sudo".`);
                                     }else{
 
-                                        console.log(`-> Created directory successfully.`);
+                                        console.log(`-> Created directory successfully or already exists.`);
 
                                     }
                                 });

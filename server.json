@@ -9,12 +9,15 @@
                 "bind_address": "0.0.0.0"
             },
             "http": {
-                "port": 3000,
+                "port": 80,
                 "enabled": true
             },
             "https": {
                 "port": 443,
+                "use_ssl_on_load_balancer": false,
                 "certificate_path": "/certs/",
+                "private_key": "private.key",
+                "certificate": "certificate.cert",
                 "enabled": false
             },
             "extensions": {

@@ -36,31 +36,92 @@ module.exports = class Server {
              */
             if(website.https.enabled){
 
-                // HTTPS Options
-                const options = {
-                    key: fs.readFileSync(global._fibre_app.root + '/sites/' + website.website_root + '/config/' + website.https.certificate_path + 'private.key'),
-                    cert: fs.readFileSync(global._fibre_app.root + '/sites/' + website.website_root + '/config/' + website.https.certificate_path + 'certificate.cert')
-                };
+                // Set key paths
+                const private_key_path = global._fibre_app.root + '/sites/' + website.website_root + '/config/' + website.https.certificate_path + website.https.private_key;
+                const certificate_key_path = global._fibre_app.root + '/sites/' + website.website_root + '/config/' + website.https.certificate_path + website.https.certificate;
 
-                // Create the server
-                const server = https.createServer(options, (req, res) => {
+                // Check if user is using SSL on load balancer
+                if(website.https.use_ssl_on_load_balancer){
 
-                    // Set default headers
-                    res.setHeader('Server', 'Fibre/1.1.2');
-                    res.setHeader("Vary", "Accept-Encoding");
+                    // Log
+                    console.log(`-> Using SSL from a load balancer.`);
 
-                    // Handle the request
-                    new HandleRequest(website, req, res, true);
+                    // Create the server
+                    const server = https.createServer((req, res) => {
 
-                }).on('error', (e) => {
-                    console.log("-> HTTPS Server Error: ", e);
-                });
+                        // Set default headers
+                        res.setHeader('Server', 'Fibre/' + global._fibre_app.version);
 
-                // Listen for requests
-                server.listen(website.https.port, bind_address);
+                        // Handle the request
+                        new HandleRequest(website, req, res, true);
 
-                // Log
-                console.log(`-> Running HTTPS.`);
+                    }).on('error', (e) => {
+                        console.log("-> HTTPS Server Error: ", e);
+                    });
+
+                    // Listen for requests
+                    server.listen(website.https.port, bind_address);
+
+                    // Log
+                    console.log(`-> Running HTTPS.`);
+
+                }else{
+
+                    // Check keys exist
+                    fs.stat(private_key_path, (err, pk_stat) => {
+                        if(err){
+
+                            // Log
+                            console.log(`-> [ERROR] Private key does not exist at "${private_key_path}", unable to start HTTPS.`);
+
+                        }else{
+
+                            fs.stat(certificate_key_path, (err, crt_stat) => {
+                                if(err){
+
+                                    // Log
+                                    console.log(`-> [ERROR] Certificate does not exist at "${certificate_key_path}", unable to start HTTPS.`);
+
+                                }else{
+
+                                    // Read key and certificate
+
+                                    // HTTPS Options
+                                    const options = {
+                                        key: fs.readFileSync(private_key_path),
+                                        cert: fs.readFileSync(certificate_key_path)
+                                    };
+
+                                    // Create the server
+                                    const server = https.createServer(options, (req, res) => {
+
+                                        // Set default headers
+                                        res.setHeader('Server', 'Fibre/' + global._fibre_app.version);
+
+                                        // Handle the request
+                                        new HandleRequest(website, req, res, true);
+
+                                    }).on('error', (e) => {
+                                        console.log("-> HTTPS Server Error: ", e);
+                                    });
+
+                                    // Listen for requests
+                                    server.listen(website.https.port, bind_address);
+
+                                    // Log
+                                    console.log(`-> Running HTTPS.`);
+
+                                }
+                            });
+
+                        }
+                    });
+
+                }
+
+
+
+
 
             }
 
@@ -75,19 +136,25 @@ module.exports = class Server {
                 const http_server = http.createServer((req, res) => {
 
                     // Set default headers
-                    res.setHeader('Server', 'Fibre/1.1.2');
-                    res.setHeader("Vary", "Accept-Encoding");
+                    res.setHeader('Server', 'Fibre/1.2.0');
 
                     // Handle the request
-                    new HandleRequest(website, req, res, false);
+                    try {
+                        new HandleRequest(website, req, res, false);
+                    } catch (error) {
+                        console.log(`-> [ERROR] Request failed to process and respond to client.`);
+                        console.log(error);
+                    }
 
+                }).on('error', (e) => {
+                    console.log("-> HTTP Server Error: ", e);
                 });
 
                 // Listen for requests
                 http_server.listen(website.http.port, bind_address);
 
                 // Log
-                console.log(`-> Running HTTP.`);
+                console.log(`-> "${website.name}" OK.`);
 
             }
 
