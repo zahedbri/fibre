@@ -14,7 +14,10 @@
             },
             "https": {
                 "port": 443,
+                "use_ssl_on_load_balancer": false,
                 "certificate_path": "/certs/",
+                "private_key": "private.key",
+                "certificate": "certificate.cert",
                 "enabled": false
             },
             "extensions": {
