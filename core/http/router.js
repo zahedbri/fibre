@@ -30,7 +30,7 @@ module.exports = class Router {
             this.options = options;
 
             // Check redirects
-            new Redirects(website, url_parts).then((redirect_data) => {
+            new Redirects(website, url_parts, options.is_ssl).then((redirect_data) => {
 
                 resolve({
                     is_redirect: true,

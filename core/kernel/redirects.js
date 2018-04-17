@@ -12,7 +12,7 @@ module.exports = class Redirects {
     /**
      * Constructor
      */
-    constructor(website, url_parts){
+    constructor(website, url_parts, is_ssl){
         return new Promise((resolve, reject) => {
 
             // Get redirect file contents
@@ -81,7 +81,7 @@ module.exports = class Redirects {
                                             // Redirect all
 
                                             // Redirect all to https when not on https
-                                            if(redirect.https === 'https'){
+                                            if(redirect.https === 'https' && !is_ssl){
                                                 resolve(redirect);
                                             }
 
@@ -113,7 +113,7 @@ module.exports = class Redirects {
                                 // Redirect all
 
                                 // Redirect all to https when not on https
-                                if(redirect.https === 'https'){
+                                if(redirect.https === 'https' && !is_ssl){
                                     resolve(redirect);
                                 }
 
