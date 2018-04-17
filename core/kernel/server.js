@@ -63,7 +63,7 @@ module.exports = class Server {
                         });
 
                         // Handle the request
-                        new HandleRequest(website, req, res, request.socket.encrypted || false);
+                        new HandleRequest(website, req, res, req.socket.encrypted || false);
 
                     }).on('error', (e) => {
                         console.log("-> HTTPS Server Error: ", e);
@@ -119,7 +119,7 @@ module.exports = class Server {
                                         });
 
                                         // Handle the request
-                                        new HandleRequest(website, req, res, request.socket.encrypted || false);
+                                        new HandleRequest(website, req, res, req.socket.encrypted || false);
 
                                     }).on('error', (e) => {
                                         console.log("-> HTTPS Server Error: ", e);
@@ -166,7 +166,7 @@ module.exports = class Server {
 
                     // Handle the request
                     try {
-                        new HandleRequest(website, req, res, request.socket.encrypted || false);
+                        new HandleRequest(website, req, res, req.socket.encrypted || false);
                     } catch (error) {
                         console.log(`-> [ERROR] Request failed to process and respond to client.`);
                         console.log(error);
