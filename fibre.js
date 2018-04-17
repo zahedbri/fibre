@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 "use strict";
 
+// Declare version
+const fibre_version = '1.3.0';
+
 // Set a global namespace for our app
 global._fibre_app = {
-    version: '1.3.0',
+    version: fibre_version,
     os_win: process.platform === "win32",
     root: process.env.SNAP_DATA || require('path').dirname(require.main.filename),
     encoding: {
@@ -17,6 +20,16 @@ global._fibre_app = {
     cache: [],
     redirects: [],
     redirects_lm: null,
+    default_headers: {
+            server: [
+                {name: 'Server', value: 'Fibre/' + fibre_version, enabled: true}
+            ],
+            custom: [
+                {name: 'X-Frame-Options', value: 'deny', enabled: true},
+                {name: 'X-XSS-Protection', value: '1; mode=block', enabled: true},
+                {name: 'X-Content-Type-Options', value: 'nosniff', enabled: true}
+            ]
+    },
     stats: {
         requests: 0,
         get: 0,
