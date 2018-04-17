@@ -15,12 +15,9 @@ module.exports = class Redirects {
     constructor(website, url_parts){
         return new Promise((resolve, reject) => {
 
-            // Log
-            console.log(`-> Checking for redirects...`);
-
             // Get redirect file contents
             fs.stat(global._fibre_app.root + '/sites/' + website.website_root + '/config/redirects.conf',(err, stat) => {
-                if(err){                
+                if(err){
                     reject();
                 }else{
 
@@ -52,7 +49,7 @@ module.exports = class Redirects {
                                     lines.forEach(line => {
 
                                         if(!line.match(/^#/g)){
-                                            
+
                                             // Get parts
                                             // x3
                                             let redirect_part = line.split(" ",4);
@@ -69,20 +66,28 @@ module.exports = class Redirects {
 
                                     // Add to global
                                     global._fibre_app.redirects = redirects;
-                                                                 
+
                                     // Set lm
                                     global._fibre_app.redirects_lm = new Date(stat.mtime).getTime();
 
                                     // Loop redirects
                                     redirects.forEach(redirect => {
-
                                         if(url_parts.pathname === redirect.from){
 
                                             resolve(redirect);
 
+                                        }else if(redirect.from == '*' && redirect.to == '*'){
+
+                                            // Redirect all
+
+                                            // Redirect all to https when not on https
+                                            if(redirect.https === 'https'){
+                                                resolve(redirect);
+                                            }
+
                                         }
                                     });
-        
+
                                     reject('The route did not match any redirects.');
 
                                 } catch (error) {
@@ -103,6 +108,15 @@ module.exports = class Redirects {
 
                                 resolve(redirect);
 
+                            }else if(redirect.from == '*' && redirect.to == '*'){
+
+                                // Redirect all
+
+                                // Redirect all to https when not on https
+                                if(redirect.https === 'https'){
+                                    resolve(redirect);
+                                }
+
                             }
                         });
 
@@ -112,7 +126,7 @@ module.exports = class Redirects {
 
                 }
             });
-        
+
         });
     }
 

@@ -22,7 +22,32 @@
             },
             "extensions": {
 
-            }
+            },
+            "server_status": {
+                "enabled": false,
+                "route": "/server-status",
+                "security": {
+                    "allow_all": false,
+                    "ip_address_block": "10.0.0.0/8"
+                }
+            },
+            "default_headers": [
+                {
+                    "name": "X-Frame-Options",
+                    "value": "deny",
+                    "enabled": true
+                },
+                {
+                    "name": "X-XSS-Protection",
+                    "value": "1; mode=block",
+                    "enabled": true
+                },
+                {
+                    "name": "X-Content-Type-Options",
+                    "value": "nosniff",
+                    "enabled": true
+                }
+            ]
         }
     }
 }

@@ -9,6 +9,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const ResponseController = require('./response');
 const ViewController = require('./view');
+const os = require('os');
 
 /**
  * Class: HandleRequest
@@ -34,8 +35,14 @@ module.exports = class HandleRequest {
         // Set website
         this.website = website;
 
+        // Declare options
+        let options = {};
+
         // Get client's ip address
         const client_ip = request.connection.remoteAddress || null;
+
+        // Add client_ip to options
+        options.client_ip = client_ip;
 
         // Get URL parts
         let url_parts = url.parse((is_ssl ? 'https': 'http') + '://' + request.headers.host + request.url, true);
@@ -44,38 +51,60 @@ module.exports = class HandleRequest {
         console.log(`-> Handling request "${request.url}" from "${client_ip}" for website "${website.name}".`);
 
         // Send to the router
-        new Router(url_parts, website).then((route_data) => {
+        new Router(url_parts, website, options).then((route_data) => {
 
             // Redirect
             if('undefined' !== typeof route_data.is_redirect && route_data.is_redirect === true){
 
                 // Log
-                console.log(`-> Redirecting client.`);            
+                console.log(`-> Redirecting client.`);
 
-                // Set to address
-                let redirect_to = route_data.item.to;
-                if(route_data.item.https === 'https'){
-                    if(url_parts.host !== null){
-                        redirect_to = 'https://' + url_parts.host + route_data.item.to;
+                // Redirect all to https
+                if(route_data.item.to === '*' && route_data.item.https === 'https'){
+
+                    // Redirect to
+                    let redirect_to = 'https://' + url_parts.host + url_parts.pathname;
+
+                    // Log
+                    console.log(`-> Redirecting from ${url_parts.host}${url_parts.pathname} to URL: ${redirect_to}`);
+
+                    // Set
+                    response.setHeader("Location", redirect_to);
+
+                    // Set Status Code
+                    response.writeHead(route_data.item.code);
+
+                    // Write data
+                    response.end();
+
+                }else{
+
+                    // Set to address
+                    let redirect_to = route_data.item.to;
+                    if(route_data.item.https === 'https'){
+                        if(url_parts.host !== null){
+                            redirect_to = 'https://' + url_parts.host + route_data.item.to;
+                        }
                     }
+
+                    console.log(`-> Redirecting to URL: ${redirect_to}`);
+
+                    // Set
+                    response.setHeader("Location", redirect_to);
+
+                    // Set Status Code
+                    response.writeHead(route_data.item.code);
+
+                    // Write data
+                    response.end();
+
                 }
-
-                console.log(`-> Redirecting to URL: ${redirect_to}`);
-
-                // Set
-                response.setHeader("Location", redirect_to);
-
-                // Set Status Code
-                response.writeHead(route_data.item.code);
-
-                // Write data
-                response.end();                
 
             }else if('undefined' !== typeof route_data.is_cache && route_data.is_cache){
 
                 /**
                  * Cache match
-                 */                
+                 */
 
                 // Log
                 console.log(`-> Sending a cached response.`);
@@ -153,68 +182,113 @@ module.exports = class HandleRequest {
 
             }else{
 
-                console.log(`-> RouteType = RouteMatch`);
-
                 /**
                  * Route Match
                  */
 
-                // Require the controller
-                delete require.cache[require.resolve(global._fibre_app.root + '/sites/' + website.website_root + '/controllers/' + route_data.controller)];
-                let RouteController = require(global._fibre_app.root + '/sites/' + website.website_root + '/controllers/' + route_data.controller );
+                // Check if server status page
+                if('undefined' !== typeof route_data.is_server_status && route_data.is_server_status){
 
-                // Start a new instance
-                let RouteControllerInstance = new RouteController(route_data.data_layer, ViewController, ResponseController, website);
+                    // Set header
+                    response.setHeader("Content-Type", "text/plain");
 
-                // Check if the controller has an init method
-                if('undefined' !== typeof RouteControllerInstance.init){
-                    try {
+                    // Get Avg CPU Usage
+                    let cpus = os.cpus();
 
-                        // Get return data
-                        let raw_data = RouteControllerInstance.init();
+                    /**
+                     * Plain
+                     */
 
-                        // Check for any headers
-                        if(raw_data.headers && Array.isArray(raw_data.headers) && raw_data.headers.length > 0){
-                            raw_data.headers.forEach(header => {
-                                response.setHeader(header.name, header.value);
-                            });
-                        }else{
+                    // Get server status
+                    let server_status_string = '';
 
-                            // Set header
-                            response.setHeader("Content-Type", "text/html");
+                    // Output date and time
+                    server_status_string += new Date().toString() + `\n`;
+                    server_status_string += 'reqs ' + global._fibre_app.stats.requests + `\n`;
+                    server_status_string += 'get ' + global._fibre_app.stats.get + `\n`;
+                    server_status_string += 'post ' + global._fibre_app.stats.post + `\n`;
+                    server_status_string += 'memory rss used ' + process.memoryUsage().rss + `\n`;
+                    server_status_string += 'memory heap total ' + process.memoryUsage().heapTotal + `\n`;
+                    server_status_string += 'memory heap used ' + process.memoryUsage().heapUsed + `\n`;
+                    for(var i = 0, len = cpus.length; i < len; i++) {
+                        server_status_string += 'cpu ' + i + '\n';
+                        var cpu = cpus[i], total = 0;
 
+                        for(var type in cpu.times) {
+                            total += cpu.times[type];
                         }
 
-                        // Write data
-                        raw_data.get_content().then((raw) => {
+                        for(type in cpu.times) {
+                            server_status_string += '\t' + type + ' ' +  Math.round(100 * cpu.times[type] / total) + '\n';
+                        }
+                    }
 
-                            // Set Status Code
-                            response.writeHead(raw_data.status_code);
+                    // Set Status Code
+                    response.writeHead(200);
 
-                            // Set data
-                            response.end(raw);
+                    // Set data
+                    response.end(server_status_string);
 
-                        }).catch((response_error) => {
+                }else{
+
+                    // Require the controller
+                    delete require.cache[require.resolve(global._fibre_app.root + '/sites/' + website.website_root + '/controllers/' + route_data.controller)];
+                    let RouteController = require(global._fibre_app.root + '/sites/' + website.website_root + '/controllers/' + route_data.controller );
+
+                    // Start a new instance
+                    let RouteControllerInstance = new RouteController(route_data.data_layer, ViewController, ResponseController, website);
+
+                    // Check if the controller has an init method
+                    if('undefined' !== typeof RouteControllerInstance.init){
+                        try {
+
+                            // Get return data
+                            let raw_data = RouteControllerInstance.init();
+
+                            // Check for any headers
+                            if(raw_data.headers && Array.isArray(raw_data.headers) && raw_data.headers.length > 0){
+                                raw_data.headers.forEach(header => {
+                                    response.setHeader(header.name, header.value);
+                                });
+                            }else{
+
+                                // Set header
+                                response.setHeader("Content-Type", "text/html");
+
+                            }
+
+                            // Write data
+                            raw_data.get_content().then((raw) => {
+
+                                // Set Status Code
+                                response.writeHead(raw_data.status_code);
+
+                                // Set data
+                                response.end(raw);
+
+                            }).catch((response_error) => {
+
+                                // Throw a 500 error
+                                this.throw_http_error(500);
+
+                            });
+
+                        } catch (error) {
+
+                            console.log(error);
 
                             // Throw a 500 error
                             this.throw_http_error(500);
 
-                        });
-
-                    } catch (error) {
-
-                        console.log(error);
-
-                        // Throw a 500 error
-                        this.throw_http_error(500);
-
+                        }
                     }
+
                 }
 
             }
 
             // Log
-            console.log(`-> Sending response for ${client_ip} for website "${website.name}".`);            
+            console.log(`-> Sending response for ${client_ip} for website "${website.name}".`);
 
         }).catch((router_error) => {
 
@@ -239,6 +313,10 @@ module.exports = class HandleRequest {
 
         // Switch on HTTP Code
         switch(http_code){
+            case 403:
+                this.response.writeHead(http_code);
+                this.response.end(file_contents);
+            break;
             case 404:
                 this.response.writeHead(http_code);
                 this.response.end(file_contents);

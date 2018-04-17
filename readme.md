@@ -66,6 +66,8 @@ sudo systemctl status snap.fibre-framework.server
 1. [Server Settings](#server-settings)
     * [Multiple Websites](#multiple-websites)
     * [Website Settings](#website-settings)
+    * [Server Status Page](#server-status-page)
+    * [Default Security Headers](#default-security-headers)
 2. [Server Redirects](#server-redirects)
 3. [Website Structure](#website-structure)
 4. [Routes](#routes)
@@ -181,6 +183,69 @@ See the below table for more information on each setting.
 
 > **Note:** Any changes made to the *server.json* file won't take affect until Fibre is restarted.
 
+# Server Status Page
+
+You can enable a server status page via the **server.json** configuration file, the server status page shows some useful information about memory usage and average usage per CPU. This page can be restricted down to a CIDR block or allow all, the latter is not recommend as this mean your server status page will be publicly accessible.
+
+### Enabling the server status page
+Open up your **server.json** file and look for the JSON object named "server_status":
+
+```json
+"server_status": {
+    "enabled": false,
+    "route": "/server-status",
+    "security": {
+        "allow_all": false,
+        "ip_address_block": "10.0.0.0/8"
+    }
+}
+```
+
+Simply change the setting "enabled" to true and change the security settings to match your requirements. By default the "server_status" module will be disabled.
+
+| Setting | Data Type | Description                                   |
+| ------- | --------- | -----------------------------------------------
+| enabled    | Boolean    | Whether or not the server status page is enabled. |
+| route | String | The URL you want your server status page to appear under. This route cannot be a dynamic route. |
+| security | Object | Holds security properties for the server status module. |
+| security.allow_all | Boolean | If this setting is **true** your server status page will be publicly accessible, meaning anyone can view it. |
+| security.ip_address_block | String | A CIDR block to allow IP address within this range to view the server status page. |
+
+You can read about CIDR blocks on the Wikipedia page [Classless Inter-Domain Routing](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+
+# Default Security Headers
+By default Fibre will set the below headers to improve security, you can change these values through the **server.json** configuration file, or disable them entirley.
+
+**Default Security Headers**
+| Name | Value | Description | Read more |
+| ---- | ----- | ----------- | --------- |
+| X-Frame-Options | deny | X-Frame-Options response header improve the protection of web applications against Clickjacking. It declares a policy communicated from a host to the client browser on whether the browser must not display the transmitted content in frames of other web pages. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xfo)
+| X-XSS-Protection | 1; mode=block | This header enables the Cross-site scripting (XSS) filter in your browser. Rather than sanitize the page, when a XSS attack is detected, the browser will prevent rendering of the page. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xxxsp)
+| X-Content-Type-Options | nosniff | Setting this header will prevent the browser from interpreting files as something else than declared by the content type in the HTTP headers. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xcto)
+
+Here is an example of what the default security headers look like in **server.json**, you can edit these or add new headers, headers will be applied to every response.
+```json
+"default_headers": [
+    {
+        "name": "X-Frame-Options",
+        "value": "deny",
+        "enabled": true
+    },
+    {
+        "name": "X-XSS-Protection",
+        "value": "1; mode=block",
+        "enabled": true
+    },
+    {
+        "name": "X-Content-Type-Options",
+        "value": "nosniff",
+        "enabled": true
+    }
+]
+```
+
+> **Note:** A server restart is required for any changes to take affect.
+
 # Server Redirects
 Your website may have already a list of redirects that need to be implemented server side, Fibre has a simple and easy syntax for adding redirects. Each website has it's own redirects module, the redirects are stored in a plain text file named **redirects.conf**, you can find this file in your website directory under **config/**, if your website does not have a redirects.conf file then created an empty one.
 
@@ -202,6 +267,12 @@ If we wanted to redirect the above to HTTPS then we would use the following rule
 
 ```
 /about /about-us 301 https
+```
+
+If you would like to redirect all requests to HTTPS then you can use the following:
+
+```
+* * 301 https
 ```
 
 # Website Structure
@@ -305,7 +376,7 @@ module.exports = class HomeController extends BaseController {
 
     init(){
 
-        return this.View.render('welcome', {version: '1.2.0'});
+        return this.View.render('welcome', {version: '1.3.0'});
 
     }
 
@@ -321,7 +392,7 @@ The above controller has one method, "init", every Controller must have an "init
 Example:
 
 ```
-return this.View.render('support.index', {version: '1.2.0'});
+return this.View.render('support.index', {version: '1.3.0'});
 ```
 
 The above view will have the below folder structure:

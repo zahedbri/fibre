@@ -50,7 +50,17 @@ module.exports = class Server {
                     const server = https.createServer((req, res) => {
 
                         // Set default headers
-                        res.setHeader('Server', 'Fibre/' + global._fibre_app.version);
+                        global._fibre_app.default_headers.server.forEach(header => {
+                            if(header.enabled){
+                                res.setHeader(header.name, header.value);
+                            }
+                        });
+
+                        global._fibre_app.default_headers.custom.forEach(header => {
+                            if(header.enabled){
+                                res.setHeader(header.name, header.value);
+                            }
+                        });
 
                         // Handle the request
                         new HandleRequest(website, req, res, true);
@@ -96,7 +106,17 @@ module.exports = class Server {
                                     const server = https.createServer(options, (req, res) => {
 
                                         // Set default headers
-                                        res.setHeader('Server', 'Fibre/' + global._fibre_app.version);
+                                        global._fibre_app.default_headers.server.forEach(header => {
+                                            if(header.enabled){
+                                                res.setHeader(header.name, header.value);
+                                            }
+                                        });
+
+                                        global._fibre_app.default_headers.custom.forEach(header => {
+                                            if(header.enabled){
+                                                res.setHeader(header.name, header.value);
+                                            }
+                                        });
 
                                         // Handle the request
                                         new HandleRequest(website, req, res, true);
@@ -119,10 +139,6 @@ module.exports = class Server {
 
                 }
 
-
-
-
-
             }
 
             /**
@@ -136,7 +152,17 @@ module.exports = class Server {
                 const http_server = http.createServer((req, res) => {
 
                     // Set default headers
-                    res.setHeader('Server', 'Fibre/1.2.0');
+                    global._fibre_app.default_headers.server.forEach(header => {
+                        if(header.enabled){
+                            res.setHeader(header.name, header.value);
+                        }
+                    });
+
+                    global._fibre_app.default_headers.custom.forEach(header => {
+                        if(header.enabled){
+                            res.setHeader(header.name, header.value);
+                        }
+                    });
 
                     // Handle the request
                     try {
@@ -215,6 +241,17 @@ module.exports = class Server {
 
                                                 // Add the routes
                                                 website['routes'] = routes;
+
+                                                // Merge default headers
+                                                try {
+                                                    global._fibre_app.default_headers.custom = Object.assign(global._fibre_app.default_headers.custom, website.default_headers);
+                                                } catch (error) {
+
+                                                    // Log
+                                                    console.log(`-> Error in "default_headers", server.json, unable to set user headers.`);
+                                                    console.log(`-> `, error);
+
+                                                }
 
                                                 // Start the server
                                                 this.ServeWebsite(website);
