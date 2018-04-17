@@ -5,6 +5,7 @@
 const fs = require("fs");
 const crypto = require('crypto');
 const Redirects = require('../kernel/redirects');
+const rangeCheck = require('range_check');
 
 /**
  * Class: Router
@@ -15,8 +16,9 @@ module.exports = class Router {
      * Constructor()
      * @param {*} url_parts
      * @param {*} routes
+     * @param {*} options
      */
-    constructor(url_parts, website){
+    constructor(url_parts, website, options){
         return new Promise((resolve, reject) => {
 
             // Route data
@@ -25,14 +27,10 @@ module.exports = class Router {
             // Set class variables
             this.website = website;
             this.url_parts = url_parts;
-
-            // Log
-            console.log("-> Finding route..");
+            this.options = options;
 
             // Check redirects
             new Redirects(website, url_parts).then((redirect_data) => {
-                
-                console.log(`-> Redirecting client...`);
 
                 resolve({
                     is_redirect: true,
@@ -62,10 +60,10 @@ module.exports = class Router {
                         // Find route
                         this.find_route().then((route_data) => {
                             resolve(route_data);
-                        }).catch(() => {
+                        }).catch((http_code) => {
 
                             // Reject
-                            reject({http_code: 404, message: ''});
+                            reject({http_code: http_code || 404, message: ''});
 
                         });
 
@@ -169,6 +167,32 @@ module.exports = class Router {
                         // Resolve
                         resolve(route);
 
+                    }
+
+                    // Check for server status page
+                    if(this.website.server_status.enabled === true){
+                        if(this.url_parts.pathname == this.website.server_status.route){
+
+                            // Check security
+                            try {
+                                if( (this.website.server_status.security.allow_all === true) || (this.website.server_status.security.allow_all === false && rangeCheck.inRange(this.options.client_ip, this.website.server_status.security.ip_address_block)) ){
+                                    resolve(
+                                        Object.assign(route, {is_server_status: true, server_status: this.website.server_status})
+                                    );
+                                }else{
+                                    reject(403);
+                                }
+                            } catch (error) {
+
+                                console.log(`-> There was an error trying to show the server status page: `);
+                                console.log(`-> `, error);
+
+                                // Reject
+                                reject(500);
+
+                            }
+
+                        }
                     }
 
                     /**

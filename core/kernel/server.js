@@ -119,10 +119,6 @@ module.exports = class Server {
 
                 }
 
-
-
-
-
             }
 
             /**
@@ -136,7 +132,7 @@ module.exports = class Server {
                 const http_server = http.createServer((req, res) => {
 
                     // Set default headers
-                    res.setHeader('Server', 'Fibre/1.2.0');
+                    res.setHeader('Server', 'Fibre/1.3.0');
 
                     // Handle the request
                     try {
