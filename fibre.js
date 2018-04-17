@@ -3,7 +3,7 @@
 
 // Set a global namespace for our app
 global._fibre_app = {
-    version: '1.2.0',
+    version: '1.3.0',
     os_win: process.platform === "win32",
     root: process.env.SNAP_DATA || require('path').dirname(require.main.filename),
     encoding: {
@@ -52,7 +52,7 @@ new StartupCheck().then(( args ) => {
             bypass = true;
         }
 
-    });    
+    });
 
     if(!bypass){
 

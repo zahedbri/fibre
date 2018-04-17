@@ -7,3 +7,4 @@
 /stage/
 state
 *.tar.bz2
+/node_modules/
