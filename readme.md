@@ -269,6 +269,12 @@ If we wanted to redirect the above to HTTPS then we would use the following rule
 /about /about-us 301 https
 ```
 
+If you would like to redirect all requests to HTTPS then you can use the following:
+
+```
+* * 301 https
+```
+
 # Website Structure
 To get started you will need to use the below command to create a new website, the command will create a skeleton project with all the required files needed to run a website.
 

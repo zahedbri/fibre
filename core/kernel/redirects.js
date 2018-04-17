@@ -72,10 +72,18 @@ module.exports = class Redirects {
 
                                     // Loop redirects
                                     redirects.forEach(redirect => {
-
                                         if(url_parts.pathname === redirect.from){
 
                                             resolve(redirect);
+
+                                        }else if(redirect.from == '*' && redirect.to == '*'){
+
+                                            // Redirect all
+
+                                            // Redirect all to https when not on https
+                                            if(redirect.https === 'https'){
+                                                resolve(redirect);
+                                            }
 
                                         }
                                     });
@@ -99,6 +107,15 @@ module.exports = class Redirects {
                             if(url_parts.pathname === redirect.from){
 
                                 resolve(redirect);
+
+                            }else if(redirect.from == '*' && redirect.to == '*'){
+
+                                // Redirect all
+
+                                // Redirect all to https when not on https
+                                if(redirect.https === 'https'){
+                                    resolve(redirect);
+                                }
 
                             }
                         });

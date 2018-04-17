@@ -59,24 +59,46 @@ module.exports = class HandleRequest {
                 // Log
                 console.log(`-> Redirecting client.`);
 
-                // Set to address
-                let redirect_to = route_data.item.to;
-                if(route_data.item.https === 'https'){
-                    if(url_parts.host !== null){
-                        redirect_to = 'https://' + url_parts.host + route_data.item.to;
+                // Redirect all to https
+                if(route_data.item.to === '*' && route_data.item.https === 'https'){
+
+                    // Redirect to
+                    let redirect_to = 'https://' + url_parts.host + url_parts.pathname;
+
+                    // Log
+                    console.log(`-> Redirecting from ${url_parts.host}${url_parts.pathname} to URL: ${redirect_to}`);
+
+                    // Set
+                    response.setHeader("Location", redirect_to);
+
+                    // Set Status Code
+                    response.writeHead(route_data.item.code);
+
+                    // Write data
+                    response.end();
+
+                }else{
+
+                    // Set to address
+                    let redirect_to = route_data.item.to;
+                    if(route_data.item.https === 'https'){
+                        if(url_parts.host !== null){
+                            redirect_to = 'https://' + url_parts.host + route_data.item.to;
+                        }
                     }
+
+                    console.log(`-> Redirecting to URL: ${redirect_to}`);
+
+                    // Set
+                    response.setHeader("Location", redirect_to);
+
+                    // Set Status Code
+                    response.writeHead(route_data.item.code);
+
+                    // Write data
+                    response.end();
+
                 }
-
-                console.log(`-> Redirecting to URL: ${redirect_to}`);
-
-                // Set
-                response.setHeader("Location", redirect_to);
-
-                // Set Status Code
-                response.writeHead(route_data.item.code);
-
-                // Write data
-                response.end();
 
             }else if('undefined' !== typeof route_data.is_cache && route_data.is_cache){
 
