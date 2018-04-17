@@ -44,6 +44,9 @@ module.exports = class HandleRequest {
         // Add client_ip to options
         options.client_ip = client_ip;
 
+        // Add if SSL to options
+        options.is_ssl = is_ssl;
+
         // Get URL parts
         let url_parts = url.parse((is_ssl ? 'https': 'http') + '://' + request.headers.host + request.url, true);
 
@@ -63,7 +66,7 @@ module.exports = class HandleRequest {
                 if(route_data.item.to === '*' && route_data.item.https === 'https'){
 
                     // Redirect to
-                    let redirect_to = 'https://' + url_parts.host + url_parts.pathname;
+                    let redirect_to = 'https://' + url_parts.host.toString().replace(':' + this.website.http.port, ':' + this.website.https.port) + url_parts.pathname;
 
                     // Log
                     console.log(`-> Redirecting from ${url_parts.host}${url_parts.pathname} to URL: ${redirect_to}`);
