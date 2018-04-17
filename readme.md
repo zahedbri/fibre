@@ -217,6 +217,7 @@ You can read about CIDR blocks on the Wikipedia page [Classless Inter-Domain Rou
 By default Fibre will set the below headers to improve security, you can change these values through the **server.json** configuration file, or disable them entirley.
 
 **Default Security Headers**
+
 | Name | Value | Description | Read more |
 | ---- | ----- | ----------- | --------- |
 | X-Frame-Options | deny | X-Frame-Options response header improve the protection of web applications against Clickjacking. It declares a policy communicated from a host to the client browser on whether the browser must not display the transmitted content in frames of other web pages. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xfo)
