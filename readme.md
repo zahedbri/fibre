@@ -67,6 +67,7 @@ sudo systemctl status snap.fibre-framework.server
     * [Multiple Websites](#multiple-websites)
     * [Website Settings](#website-settings)
     * [Server Status Page](#server-status-page)
+    * [Default Security Headers](#default-security-headers)
 2. [Server Redirects](#server-redirects)
 3. [Website Structure](#website-structure)
 4. [Routes](#routes)
@@ -211,6 +212,39 @@ Simply change the setting "enabled" to true and change the security settings to 
 | security.ip_address_block | String | A CIDR block to allow IP address within this range to view the server status page. |
 
 You can read about CIDR blocks on the Wikipedia page [Classless Inter-Domain Routing](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+
+# Default Security Headers
+By default Fibre will set the below headers to improve security, you can change these values through the **server.json** configuration file, or disable them entirley.
+
+**Default Security Headers**
+| Name | Value | Description | Read more |
+| ---- | ----- | ----------- | --------- |
+| X-Frame-Options | deny | X-Frame-Options response header improve the protection of web applications against Clickjacking. It declares a policy communicated from a host to the client browser on whether the browser must not display the transmitted content in frames of other web pages. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xfo)
+| X-XSS-Protection | 1; mode=block | This header enables the Cross-site scripting (XSS) filter in your browser. Rather than sanitize the page, when a XSS attack is detected, the browser will prevent rendering of the page. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xxxsp)
+| X-Content-Type-Options | nosniff | Setting this header will prevent the browser from interpreting files as something else than declared by the content type in the HTTP headers. | [Read more](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#xcto)
+
+Here is an example of what the default security headers look like in **server.json**, you can edit these or add new headers, headers will be applied to every response.
+```json
+"default_headers": [
+    {
+        "name": "X-Frame-Options",
+        "value": "deny",
+        "enabled": true
+    },
+    {
+        "name": "X-XSS-Protection",
+        "value": "1; mode=block",
+        "enabled": true
+    },
+    {
+        "name": "X-Content-Type-Options",
+        "value": "nosniff",
+        "enabled": true
+    }
+]
+```
+
+> **Note:** A server restart is required for any changes to take affect.
 
 # Server Redirects
 Your website may have already a list of redirects that need to be implemented server side, Fibre has a simple and easy syntax for adding redirects. Each website has it's own redirects module, the redirects are stored in a plain text file named **redirects.conf**, you can find this file in your website directory under **config/**, if your website does not have a redirects.conf file then created an empty one.
