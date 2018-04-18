@@ -154,6 +154,7 @@ module.exports = class Router {
 
                     // Add the data layer
                     route['data_layer'] = {
+                        VERSION: global._fibre_app.version,
                         PATHNAME: this.url_parts.pathname,
                         PATH: this.url_parts.path,
                         SEARCH: this.url_parts.search,

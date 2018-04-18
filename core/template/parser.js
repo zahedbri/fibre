@@ -69,13 +69,51 @@ module.exports = class Parser {
     }
 
     /**
+     * get_variable_value()
+     * @param {*} depth
+     * @param {*} static_variable
+     */
+    get_variable_value(depth, static_variable){
+
+        // Value of last item
+        let value = null;
+
+        // Current iteration
+        let current = static_variable;
+
+        // Current DYN
+        let current_dyn = this.data_layer;
+
+        if(depth > 0){
+            for (let index = 0; index < depth; index++) {
+
+                // Get first part of static_variable
+                current_dyn = current_dyn[current[0]];
+
+                // Get last one
+                if(current.length == 1){
+                    value = current_dyn;
+                    current = current[0];
+                    break;
+                }
+
+                // Remove first value
+                current.shift();
+
+            }
+        }
+
+        return value;
+    }
+
+    /**
      * Parse Variables
      */
     parse_variables(){
         return new Promise((resolve, reject) => {
 
             // Get all the matches
-            var variable_placeholders = this.raw_source.match(/{{\s[a-z].+\s}}/g);
+            var variable_placeholders = this.raw_source.match(new RegExp(/{{\s([a-zA-Z.]+)\s}}/, "g"));
 
             // Iterate
             if('undefined' !== typeof variable_placeholders && Array.isArray(variable_placeholders) && variable_placeholders.length > 0){
@@ -90,19 +128,26 @@ module.exports = class Parser {
                     // Check the variable is in the data layer
                     try {
 
-                        if(var_depth <= 1){
+                        // Get value
+                        let var_value = this.get_variable_value(var_depth, var_name.split("."));
 
-                            if('undefined' !== typeof this.data_layer[var_name]){
+                        // Get type
+                        let var_type = typeof var_value;
 
-                                // Replace
-                                this.raw_source = this.raw_source.replace(item, decodeURIComponent(this.data_layer[var_name]));
+                        // Check if undefined
+                        if('undefined' !== var_type){
 
-                            }else{
-
-                                // Replace with nothing
-                                this.raw_source = this.raw_source.replace(item, '');
-
+                            // String | Integer
+                            if(['number','string','boolean'].indexOf(var_type) > -1){
+                                this.raw_source = this.raw_source.replace(item, decodeURIComponent(var_value));
+                            }else if('object' == var_type){
+                                this.raw_source = this.raw_source.replace(item, JSON.stringify(var_value, null, 2));
                             }
+
+                        }else{
+
+                            // Replace with nothing
+                            this.raw_source = this.raw_source.replace(item, '');
 
                         }
 
