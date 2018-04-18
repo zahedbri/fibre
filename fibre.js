@@ -2,7 +2,7 @@
 "use strict";
 
 // Declare version
-const fibre_version = '1.3.0';
+const fibre_version = '1.3.1';
 
 // Set a global namespace for our app
 global._fibre_app = {
