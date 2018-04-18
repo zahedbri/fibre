@@ -404,7 +404,7 @@ module.exports = class HomeController extends BaseController {
 
     init(){
 
-        return this.View.render('welcome', {version: '1.3.0'});
+        return this.View.render('welcome', {version: '1.3.1'});
 
     }
 
@@ -420,7 +420,7 @@ The above controller has one method, "init", every Controller must have an "init
 Example:
 
 ```
-return this.View.render('support.index', {version: '1.3.0'});
+return this.View.render('support.index', {version: '1.3.1'});
 ```
 
 The above view will have the below folder structure:
@@ -478,7 +478,7 @@ module.exports = class HomeController extends BaseController {
 
     init(){
 
-        return this.View.render('welcome', {version: '1.3.0'});
+        return this.View.render('welcome', {version: '1.3.1'});
 
     }
 
