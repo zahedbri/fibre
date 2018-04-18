@@ -52,6 +52,8 @@ module.exports = class Server {
                         // Set
                         let lob_ssl = false;
 
+                        console.log(req.headers);
+
                         // Check for forwarded ssl header
                         for (const key in req.headers) {
                             if (req.headers.hasOwnProperty(key)) {
