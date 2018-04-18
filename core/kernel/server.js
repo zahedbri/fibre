@@ -52,7 +52,7 @@ module.exports = class Server {
                         // Set
                         let lob_ssl = false;
 
-                        console.log(req.headers);
+                        console.log("-> Headers", req.headers);
 
                         // Check for forwarded ssl header
                         for (const key in req.headers) {
@@ -128,6 +128,8 @@ module.exports = class Server {
                                         // Set
                                         let lob_ssl = false;
 
+                                        console.log("-> Headers", req.headers);
+
                                         // Check for forwarded ssl header
                                         for (const key in req.headers) {
                                             if (req.headers.hasOwnProperty(key)) {
@@ -189,6 +191,26 @@ module.exports = class Server {
                 // Create the server
                 const http_server = http.createServer((req, res) => {
 
+                    // Set
+                    let lob_ssl = false;
+
+                    console.log("-> Headers", req.headers);
+
+                    // Check for forwarded ssl header
+                    for (const key in req.headers) {
+                        if (req.headers.hasOwnProperty(key)) {
+
+                            // Header
+                            const header = req.headers[key];
+                            if(key.toString().match(/X-Forwarded-Proto/gi)){
+                                if(header.match(/https/gi)){
+                                    lob_ssl = true;
+                                }
+                            }
+
+                        }
+                    }
+
                     // Set default headers
                     global._fibre_app.default_headers.server.forEach(header => {
                         if(header.enabled){
@@ -204,7 +226,7 @@ module.exports = class Server {
 
                     // Handle the request
                     try {
-                        new HandleRequest(website, req, res, req.socket.encrypted || false);
+                        new HandleRequest(website, req, res, req.socket.encrypted || lob_ssl || false);
                     } catch (error) {
                         console.log(`-> [ERROR] Request failed to process and respond to client.`);
                         console.log(error);
