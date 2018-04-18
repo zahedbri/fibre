@@ -52,17 +52,24 @@ module.exports = class Server {
                         // Set
                         let lob_ssl = false;
 
-                        console.log("-> Headers", req.headers);
-
                         // Check for forwarded ssl header
                         for (const key in req.headers) {
                             if (req.headers.hasOwnProperty(key)) {
 
                                 // Header
                                 const header = req.headers[key];
+
+                                // X Forwarded Proto
                                 if(key.toString().match(/X-Forwarded-Proto/gi)){
                                     if(header.match(/https/gi)){
                                         lob_ssl = true;
+                                    }
+                                }
+
+                                // x-forwarded-for
+                                if(key.toString().match(/X-Forwarded-For/gi)){
+                                    if(header.toString().trim() !== ''){
+                                        request.connection.client_ip = header;
                                     }
                                 }
 
@@ -128,17 +135,24 @@ module.exports = class Server {
                                         // Set
                                         let lob_ssl = false;
 
-                                        console.log("-> Headers", req.headers);
-
                                         // Check for forwarded ssl header
                                         for (const key in req.headers) {
                                             if (req.headers.hasOwnProperty(key)) {
 
                                                 // Header
                                                 const header = req.headers[key];
+
+                                                // X Forwarded Proto
                                                 if(key.toString().match(/X-Forwarded-Proto/gi)){
                                                     if(header.match(/https/gi)){
                                                         lob_ssl = true;
+                                                    }
+                                                }
+
+                                                // x-forwarded-for
+                                                if(key.toString().match(/X-Forwarded-For/gi)){
+                                                    if(header.toString().trim() !== ''){
+                                                        request.connection.client_ip = header;
                                                     }
                                                 }
 
@@ -194,17 +208,24 @@ module.exports = class Server {
                     // Set
                     let lob_ssl = false;
 
-                    console.log("-> Headers", req.headers);
-
-                    // Check for forwarded ssl header
+                    // Check for forwarded ssl header and IP address
                     for (const key in req.headers) {
                         if (req.headers.hasOwnProperty(key)) {
 
                             // Header
                             const header = req.headers[key];
+
+                            // X Forwarded Proto
                             if(key.toString().match(/X-Forwarded-Proto/gi)){
                                 if(header.match(/https/gi)){
                                     lob_ssl = true;
+                                }
+                            }
+
+                            // x-forwarded-for
+                            if(key.toString().match(/X-Forwarded-For/gi)){
+                                if(header.toString().trim() !== ''){
+                                    request.connection.client_ip = header;
                                 }
                             }
 

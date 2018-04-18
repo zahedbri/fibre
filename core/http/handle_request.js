@@ -39,7 +39,7 @@ module.exports = class HandleRequest {
         let options = {};
 
         // Get client's ip address
-        const client_ip = request.connection.remoteAddress || null;
+        const client_ip = request.connection.client_ip || request.connection.remoteAddress || null;
 
         // Add client_ip to options
         options.client_ip = client_ip;
