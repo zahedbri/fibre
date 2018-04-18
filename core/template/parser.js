@@ -11,10 +11,13 @@ const Engine = require('./engine');
 module.exports = class Parser {
     constructor(raw, data_layer, website){
 
+        // Set engine class
+        this.Engine = Engine;
+
         this.require_parse = 0;
 
         // Setup
-        this.parser_actions = ['parse_fibre', 'parse_variables', 'parse_includes', 'parse_if'];
+        this.parser_actions = ['parse_foreach', 'parse_fibre', 'parse_variables', 'parse_includes', 'parse_if'];
         this.parser_actions_completed = 0;
 
         // Raw source
@@ -104,6 +107,61 @@ module.exports = class Parser {
         }
 
         return value;
+    }
+
+    /**
+     * Parse Variables Locally
+     */
+    parse_variables_locally(content){
+
+        // Get all the matches
+        var variable_placeholders = content.match(new RegExp(/{{\s([a-zA-Z.]+)\s}}/, "g"));
+
+        // Iterate
+        if('undefined' !== typeof variable_placeholders && Array.isArray(variable_placeholders) && variable_placeholders.length > 0){
+            variable_placeholders.forEach(item => {
+
+                // Get variable name
+                let var_name = item.toString().replace('{{','').replace('}}','').trim()
+
+                // Get depth level
+                var var_depth = var_name.split(".").length;
+
+                // Check the variable is in the data layer
+                try {
+
+                    // Get value
+                    let var_value = this.get_variable_value(var_depth, var_name.split("."));
+
+                    // Get type
+                    let var_type = typeof var_value;
+
+                    // Check if undefined
+                    if('undefined' !== var_type){
+
+                        // String | Integer
+                        if(['number','string','boolean'].indexOf(var_type) > -1){
+                            content = content.replace(item, decodeURIComponent(var_value));
+                        }else if('object' == var_type){
+                            content = content.replace(item, JSON.stringify(var_value, null, 2));
+                        }
+
+                    }else{
+
+                        // Replace with nothing
+                        content = content.replace(item, '');
+
+                    }
+
+                } catch (variable_error) {
+                    this.errors.push(`The variable ${var_name} is not defined in your data layer.`);
+                    reject();
+                }
+
+            });
+        }
+
+        return content;
     }
 
     /**
@@ -266,6 +324,90 @@ module.exports = class Parser {
             }
 
             resolve();
+
+        });
+    }
+
+    parse_foreach(){
+        return new Promise((resolve, reject) => {
+
+            // Get all the matches
+            var foreach_statements = this.raw_source.match(new RegExp(/@foreach\(([a-zA-Z.]+)\sas\s([a-zA-Z]+)\s=>\s([a-zA-Z]+)\)([\s\S]*?)(@endforeach)/, "g"));
+
+            // Iterate
+            if('undefined' !== typeof foreach_statements && Array.isArray(foreach_statements) && foreach_statements.length > 0){
+                foreach_statements.forEach(item => {
+
+                    // Get groups
+                    const groups = item.match(/@foreach\(([a-zA-Z.]+)\sas\s([a-zA-Z]+)\s=>\s([a-zA-Z]+)\)([\s\S]*?)(@endforeach)/);
+
+                    // Get variable in data layer we want to use
+                    const variable_in_dl = groups[1];
+
+                    // Get variable name for index
+                    const index_var_name = groups[2];
+
+                    // Get variable name for item
+                    const item_var_name = groups[3];
+
+                    // Get content to render on each iteration
+                    const content = groups[4];
+
+                    let content_parsed = '';
+
+                    // Try / Catch
+                    try {
+
+                        // Get the array value
+                        let variable_in_dl_value = this.get_variable_value(variable_in_dl.split(".").length, variable_in_dl.split("."));
+                        var copy = variable_in_dl_value.slice(0);
+
+                        // Iterate over the array
+                        if(Array.isArray(copy)){
+
+                            const item_count = copy.length;
+
+                            // Get position
+                            let position = this.raw_source.indexOf(item);
+
+                            // Replace
+                            this.raw_source = this.raw_source.replace(item, '');
+
+                            // For loop to insert dummy items
+                            for(let x = 0;x < item_count; x++){
+
+                                // Set item
+                                let iterated_item = copy[x];
+
+                                // Add this iterated item to the data layer
+                                this.data_layer[item_var_name] = iterated_item;
+
+                                // Content parsed
+                                content_parsed += this.parse_variables_locally(content);
+
+                            }
+
+                            // Replace in dom
+                            this.raw_source = [this.raw_source.slice(0, position), content_parsed, this.raw_source.slice(position)].join('');
+
+                        }else{
+                            console.log(`-> Error in @foreach statement, ${variable_in_dl} is not an array.`);
+                            reject();
+                        }
+
+                        resolve();
+
+                    } catch (error) {
+                        console.log(`-> Error in @foreach statement.`);
+                        console.log(`-> `, error);
+                        reject();
+                    }
+
+                });
+
+            }else{
+                resolve();
+            }
 
         });
     }
