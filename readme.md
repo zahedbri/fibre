@@ -72,6 +72,13 @@ sudo systemctl status snap.fibre-framework.server
 3. [Website Structure](#website-structure)
 4. [Routes](#routes)
 5. [Controllers](#controllers)
+6. [View Class](#view-class)
+7. [Response Class](#response-class)
+7. [Template Engine](#template-engine)
+    * [Data Layer](#data-layer)
+    * [Using data from the data_layer in your HTML file](#using-data-from-the-data_layer-in-your-html-file)
+    * [Include sub views/templates](#include-sub-views/templates)
+    * [IF Conditions](#if-conditions)
 
 # Server Settings
 The server settings is where you can define all of your websites configuration including hosting multiple websites, it's as easy as editing a simple JSON file.
@@ -248,33 +255,53 @@ Here is an example of what the default security headers look like in **server.js
 > **Note:** A server restart is required for any changes to take affect.
 
 # Server Redirects
-Your website may have already a list of redirects that need to be implemented server side, Fibre has a simple and easy syntax for adding redirects. Each website has it's own redirects module, the redirects are stored in a plain text file named **redirects.conf**, you can find this file in your website directory under **config/**, if your website does not have a redirects.conf file then created an empty one.
+Your website may have already a list of redirects that need to be implemented server side, Fibre has a simple and easy syntax for adding redirects. Each website has it's own redirects module, the redirects are stored in a JSON file named **redirects.json**, you can find this file in your website directory under **config/**, if your website does not have a redirects.json file then create an empty one with the following contents:
 
-### Syntax
-Each redirect must be on it's own line, each line is space delimited, every value must be entered even if you do not need it, and in order to the below:
+```json
+[
 
-```
-{from}(String) {to}(String) {http redirect code}(integer) {http|https}
-```
-
-**Example:**
-Below is an example for a redirect from "/about" to "/about-us" with a 301 response code.
-
-```
-/about /about-us 301 http
+]
 ```
 
-If we wanted to redirect the above to HTTPS then we would use the following rule:
+### Example
+Take a look at the below example, this will redirect the user to the homepage if they try and visit the URL "/about".
 
-```
-/about /about-us 301 https
+```json
+[
+    {
+        "url": "/about",
+        "redirect_to": "/",
+        "code": 301,
+        "require_https": false,
+        "redirect_secure": false
+    }
+]
 ```
 
-If you would like to redirect all requests to HTTPS then you can use the following:
+### Redirect from HTTP to HTTPS
+Use the redirect below to redirect all requests that are not secure (HTTP) to HTTPS.
 
+```json
+[
+    {
+        "url": "all",
+        "redirect_to": "current",
+        "code": 301,
+        "require_https": false,
+        "redirect_secure": false
+    }
+]
 ```
-* * 301 https
-```
+
+### Properties
+
+| Name | Data Type | Description |
+| ---- | --------- | ----------- |
+| url | String | The relative path to redirect from. |
+| redirect_to | String | The relative path to redirect to. |
+| code | Integer | A valid HTTP response code. |
+| require_https | Boolean | Whether or not the request requires to be on HTTPS before the redirect can take place. |
+| redirect_secure | Boolean | Redirect the user with HTTPS. |
 
 # Website Structure
 To get started you will need to use the below command to create a new website, the command will create a skeleton project with all the required files needed to run a website.
@@ -400,3 +427,204 @@ The above view will have the below folder structure:
 
 - support/
     - index.html
+
+# View Class
+The View class renders a HTML page before it's output is shown to the user. When you extend your own custom controller from the BaseController you will automatically gain access to the View class.
+
+## Methods
+
+### Render
+
+```javascript
+View.render( @view_name(String), @data_layer(Object) );
+```
+
+**Example:**
+
+```javascript
+return this.View.render('support.index', {
+    page_title: 'Support | My Website',
+    page_description: 'A short description for the page.'
+});
+```
+
+# Response Class
+The response class will output data back to the user, you can set custom headers, status code and the data. When you extend your own custom controller from the BaseController you will automatically gain access to the Response class.
+
+## Methods
+
+### Render
+
+```javascript
+Response.render( @content(String), @headers(Array of Objects), status_code(Integer));
+```
+
+**Example:**
+
+```javascript
+return this.Response.render('Hello World', [ { "Content-Type": "text/plain" } ], 200);
+```
+
+# Template Engine
+Fibre uses it's own templating engine, you can use the templating engine simply by rendering a View from within your Controller. An example of this is below.
+
+## Example
+The below example is the home controller and the very first page you see when you install Fibre Framework and navigate to your host, ie: 127.0.0.1 for example.
+
+```javascript
+"use strict";
+const BaseController = require('./BaseController');
+module.exports = class HomeController extends BaseController {
+
+    init(){
+
+        return this.View.render('welcome', {version: '1.3.0'});
+
+    }
+
+    // You can write more methods here...
+
+}
+```
+
+The controller's init method is called, when this is called we return a new **View**, we are telling the View Class to use the **welcome** view which relates to **welcome.html** within your **views/** directory. The view name supports path seperation using the dot character, for example imagine you had the file structure below:
+
+```
+views/
+    /support/
+        index.html
+```
+
+You would simply type "support.index" to return the index.html file inside the support folder.
+
+```javascript
+"use strict";
+const BaseController = require('./BaseController');
+module.exports = class HomeController extends BaseController {
+
+    init(){
+
+        return this.View.render('support.index', {});
+
+    }
+
+    // You can write more methods here...
+
+}
+```
+
+## Data Layer
+
+When your **Controller** is initiated Fibre passes along a data layer prefilled with some useful variables that you can use in your Controller and View.
+
+```
+PATHNAME:    The path of the request such as "/about",
+PATH:        The path of the request including SEARCH,
+SEARCH:      The query string,
+QUERY:       The query string as an Object,
+PROTOCOL:    The protocol used for this request,
+HOST:        The host name,
+PORT:        The port this request was made on,
+SCRIPT_NAME: The last part of the pathname, usually the name of the file
+```
+
+You can access the above variables through the data layer, see below for an example.
+
+```javascript
+"use strict";
+const BaseController = require('./BaseController');
+module.exports = class HomeController extends BaseController {
+
+    init(){
+
+        return this.View.render('index', {
+            page_name: this.data_layer.SCRIPT_NAME // <--- Using SCRIPT_NAME from the data layer object.
+        });
+
+    }
+
+    // You can write more methods here...
+
+}
+```
+
+## Using data from the data_layer in your HTML file
+
+Below is an example of the Fibre homepage when you first install Fibre.
+
+```html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Fibre</title>
+    </head>
+    <body>
+        <div class="flex-center position-ref full-height">
+
+            <div class="content">
+                <div class="title m-b-md">
+                    Fibre
+                    <small style="font-size:1.5rem;display:block;">version {{ version }}</small>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+```
+
+When display variables Fibre uses the curly braces x2 on either side of the variable name, there also needs to be one space either side of the variable name, this is to keep code consistent and clean.
+
+### Correct
+
+```HTML
+{{ my_variable }}
+```
+
+### Wrong
+
+```HTML
+{{my_variable}}
+{ my_variable }
+```
+
+## Include sub views/templates
+You can include another HTML file within your view by using the following syntax:
+
+```HTML
+@include "templates.html_head"
+```
+
+You must specify the keyword @include followed by one space and then your view name in double quotes, the view name here follows the same path seperation as when you call a view within your Controller, using the dot character.
+
+# IF Conditions
+You can use if conditions within your views but they are very basic and do not include an else block as of yet. See the following example of an IF Condition in use.
+
+```html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Fibre</title>
+
+    </head>
+    <body>
+        <div class="flex-center position-ref full-height">
+
+            <div class="content">
+                <div class="title m-b-md">
+                    Fibre
+                    @if( version ) // <--- IF Condition
+                    	<small style="font-size:1.5rem;display:block;">version {{ version }}</small>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+```
