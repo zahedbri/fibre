@@ -49,6 +49,24 @@ module.exports = class Server {
                     // Create the server
                     const server = https.createServer((req, res) => {
 
+                        // Set
+                        let lob_ssl = false;
+
+                        // Check for forwarded ssl header
+                        for (const key in req.headers) {
+                            if (req.headers.hasOwnProperty(key)) {
+
+                                // Header
+                                const header = req.headers[key];
+                                if(key.toString().match(/X-Forwarded-Proto/gi)){
+                                    if(header.match(/https/gi)){
+                                        lob_ssl = true;
+                                    }
+                                }
+
+                            }
+                        }
+
                         // Set default headers
                         global._fibre_app.default_headers.server.forEach(header => {
                             if(header.enabled){
@@ -63,7 +81,7 @@ module.exports = class Server {
                         });
 
                         // Handle the request
-                        new HandleRequest(website, req, res, req.socket.encrypted || false);
+                        new HandleRequest(website, req, res, req.socket.encrypted || lob_ssl || false);
 
                     }).on('error', (e) => {
                         console.log("-> HTTPS Server Error: ", e);
@@ -105,6 +123,24 @@ module.exports = class Server {
                                     // Create the server
                                     const server = https.createServer(options, (req, res) => {
 
+                                        // Set
+                                        let lob_ssl = false;
+
+                                        // Check for forwarded ssl header
+                                        for (const key in req.headers) {
+                                            if (req.headers.hasOwnProperty(key)) {
+
+                                                // Header
+                                                const header = req.headers[key];
+                                                if(key.toString().match(/X-Forwarded-Proto/gi)){
+                                                    if(header.match(/https/gi)){
+                                                        lob_ssl = true;
+                                                    }
+                                                }
+
+                                            }
+                                        }
+
                                         // Set default headers
                                         global._fibre_app.default_headers.server.forEach(header => {
                                             if(header.enabled){
@@ -119,7 +155,7 @@ module.exports = class Server {
                                         });
 
                                         // Handle the request
-                                        new HandleRequest(website, req, res, req.socket.encrypted || false);
+                                        new HandleRequest(website, req, res, req.socket.encrypted || lob_ssl || false);
 
                                     }).on('error', (e) => {
                                         console.log("-> HTTPS Server Error: ", e);
