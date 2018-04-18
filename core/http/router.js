@@ -143,6 +143,9 @@ module.exports = class Router {
                     // Get route
                     const route = routes[key];
 
+                    // Add is_server_status
+                    route.is_server_status = false;
+
                     // Get url
                     const route_url = route.url.toString().toLowerCase().trim();
 
