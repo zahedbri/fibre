@@ -69,7 +69,7 @@ module.exports = class Server {
                                 // x-forwarded-for
                                 if(key.toString().match(/X-Forwarded-For/gi)){
                                     if(header.toString().trim() !== ''){
-                                        request.connection.client_ip = header;
+                                        req.connection.client_ip = header;
                                     }
                                 }
 
@@ -152,7 +152,7 @@ module.exports = class Server {
                                                 // x-forwarded-for
                                                 if(key.toString().match(/X-Forwarded-For/gi)){
                                                     if(header.toString().trim() !== ''){
-                                                        request.connection.client_ip = header;
+                                                        req.connection.client_ip = header;
                                                     }
                                                 }
 
@@ -225,7 +225,7 @@ module.exports = class Server {
                             // x-forwarded-for
                             if(key.toString().match(/X-Forwarded-For/gi)){
                                 if(header.toString().trim() !== ''){
-                                    request.connection.client_ip = header;
+                                    req.connection.client_ip = header;
                                 }
                             }
 
