@@ -360,42 +360,57 @@ module.exports = class Parser {
 
                         // Get the array value
                         let variable_in_dl_value = this.get_variable_value(variable_in_dl.split(".").length, variable_in_dl.split("."));
-                        var copy = variable_in_dl_value.slice(0);
 
-                        // Iterate over the array
-                        if(Array.isArray(copy)){
+                        let variable_in_dl_value_type = typeof variable_in_dl_value;
 
-                            const item_count = copy.length;
+                        if(variable_in_dl_value_type !== 'undefined'){
 
-                            // Get position
-                            let position = this.raw_source.indexOf(item);
+                            var copy = variable_in_dl_value.slice(0);
 
-                            // Replace
-                            this.raw_source = this.raw_source.replace(item, '');
+                            // Iterate over the array
+                            if(Array.isArray(copy)){
 
-                            // For loop to insert dummy items
-                            for(let x = 0;x < item_count; x++){
+                                const item_count = copy.length;
 
-                                // Set item
-                                let iterated_item = copy[x];
+                                // Get position
+                                let position = this.raw_source.indexOf(item);
 
-                                // Add this iterated item to the data layer
-                                this.data_layer[item_var_name] = iterated_item;
+                                // Replace
+                                this.raw_source = this.raw_source.replace(item, '');
 
-                                // Content parsed
-                                content_parsed += this.parse_variables_locally(content);
+                                // For loop to insert dummy items
+                                for(let x = 0;x < item_count; x++){
 
+                                    // Set item
+                                    let iterated_item = copy[x];
+
+                                    // Add this iterated item to the data layer
+                                    this.data_layer[item_var_name] = iterated_item;
+                                    this.data_layer[index_var_name] = x;
+
+                                    // Content parsed
+                                    content_parsed += this.parse_variables_locally(content);
+
+                                }
+
+                                // Replace in dom
+                                this.raw_source = [this.raw_source.slice(0, position), content_parsed, this.raw_source.slice(position)].join('');
+
+                            }else{
+                                console.log(`-> Error in @foreach statement, ${variable_in_dl} is not an array.`);
+                                reject();
                             }
 
-                            // Replace in dom
-                            this.raw_source = [this.raw_source.slice(0, position), content_parsed, this.raw_source.slice(position)].join('');
+                            // Resolve
+                            resolve();
+
+                            // Require another parse
+                            this.require_parse = 1;
 
                         }else{
-                            console.log(`-> Error in @foreach statement, ${variable_in_dl} is not an array.`);
+                            console.log(`-> Error in @foreach statement, ${variable_in_dl} is undefined.`);
                             reject();
                         }
-
-                        resolve();
 
                     } catch (error) {
                         console.log(`-> Error in @foreach statement.`);

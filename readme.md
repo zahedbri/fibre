@@ -79,6 +79,7 @@ sudo systemctl status snap.fibre-framework.server
     * [Using data from the data_layer in your HTML file](#using-data-from-the-data_layer-in-your-html-file)
     * [Include sub views/templates](#include-sub-views/templates)
     * [IF Conditions](#if-conditions)
+    * [Foreach Loops](#foreach-loops)
 
 # Server Settings
 The server settings is where you can define all of your websites configuration including hosting multiple websites, it's as easy as editing a simple JSON file.
@@ -640,6 +641,92 @@ You can use if conditions within your views but they are very basic and do not i
                     	<small style="font-size:1.5rem;display:block;">version {{ version }}</small>
                     @endif
                 </div>
+            </div>
+        </div>
+    </body>
+</html>
+```
+
+# Foreach Loops
+You can use foreach loops within your HTML files, you can not nest foreach loops yet but this will be available in future releases. Take a look at the example Controller and View below:
+
+## Controller
+
+```javascript
+"use strict";
+const BaseController = require('./BaseController');
+module.exports = class HomeController extends BaseController {
+
+    init(){
+
+        // Static user data
+        this.data_layer.users = [
+            {
+                id: 1,
+                name: "Ben",
+                location: "London"
+            },
+            {
+                id: 2,
+                name: "Dave",
+                location: "Paris"
+            },
+            {
+                id: 3,
+                name: "Marissa",
+                location: "New York"
+            }
+        ];
+
+        return this.View.render('welcome', this.data_layer);
+
+    }
+
+}
+```
+
+## View
+The **users** variable in the View below relates to the users array in the **this.data_layer** above.
+
+```html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Fibre</title>
+
+    </head>
+    <body>
+        <div class="flex-center position-ref full-height">
+
+            <div class="content">
+                <div class="title m-b-md">
+                    Fibre
+                    <small style="font-size:1.5rem;display:block;font-weight: 300;">version</small>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Name</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(users as key => user)
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.location }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
             </div>
         </div>
     </body>
