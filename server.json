@@ -1,6 +1,7 @@
 {
     "websites": {
         "default": {
+            "dev": true,
             "name": "My default website",
             "website_root": "test/",
             "document_root": "test/public/",

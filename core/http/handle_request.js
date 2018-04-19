@@ -29,6 +29,9 @@ module.exports = class HandleRequest {
         global._fibre_app.stats.requests++;
         global._fibre_app.stats.get++;
 
+        // Get the request ID.
+        this.request_id = request._fibre_request_id;
+
         // Set response
         this.response = response;
 
@@ -211,6 +214,7 @@ module.exports = class HandleRequest {
                         try {
 
                             // Get return data
+                            // raw_data = View Class
                             let raw_data = RouteControllerInstance.init();
 
                             // Check for any headers
@@ -231,10 +235,19 @@ module.exports = class HandleRequest {
                                 // Set Status Code
                                 response.writeHead(raw_data.status_code);
 
+                                // Add to session
+                                global._fibre_app.requests.status_code = raw_data.status_code;
+
+                                // Include dev toolbar
+                                const dev_html = this.show_dev_toolbar();
+
                                 // Set data
-                                response.end(raw);
+                                response.end(raw + dev_html);
 
                             }).catch((response_error) => {
+
+                                // Add error
+                                global._fibre_app.requests[this.request_id].errors.push(response_error);
 
                                 // Throw a 500 error
                                 this.throw_http_error(500);
@@ -243,7 +256,8 @@ module.exports = class HandleRequest {
 
                         } catch (error) {
 
-                            console.log(error);
+                            // Add to errors
+                            global._fibre_app.requests[this.request_id].errors.push(error);
 
                             // Throw a 500 error
                             this.throw_http_error(500);
@@ -278,6 +292,12 @@ module.exports = class HandleRequest {
 
         http_code = http_code || 500;
         file_contents = file_contents || '';
+
+        // Add to session
+        global._fibre_app.requests.status_code = http_code;
+
+        // Include dev toolbar
+        file_contents = this.show_dev_toolbar();
 
         // Switch on HTTP Code
         switch(http_code){
@@ -317,6 +337,97 @@ module.exports = class HandleRequest {
             }
         });
 
+    }
+
+    /**
+     * Show Developer Toolbar
+     */
+    show_dev_toolbar(){
+
+        // Check dev mode is on
+        if('undefined' !== typeof this.website.dev && this.website.dev === true){
+
+            // Log
+            console.log(`-> DEV mode is on, showing toolbar.`);
+
+            // End execution time
+            var time_took = new Date() - global._fibre_app.requests[this.request_id].start || 0;
+
+            // Read HTML
+            let dev_toolbar = `<!-- Fibre Developer Toolbar -->
+            <style>
+                #fibre_dev_content {
+                    font-family: monospace;
+                }
+
+                #fibre_dev_toolbar {
+                    position: fixed;
+                    bottom: 0;
+                    width: 100%;
+                    background: #ecf0f1;
+                    font-size: 0.8rem;
+                }
+
+                #fibre_dev_toolbar ul {
+                    list-style: none;
+                    overflow: hidden;
+                    width: 100%;
+                    display: block;
+                    margin: 0;
+                    padding:0;
+                }
+
+                #fibre_dev_toolbar ul > li {
+                    padding:20px;
+                    color: #34495e;
+                    float: left;
+                    border-right:1px solid #bdc3c7;
+                    text-align: center;
+                }
+
+                .fibre_dev_toolbar_green {
+                    color: #27ae60 !important;
+                }
+
+            </style>`;
+
+            // Dev Toolbar
+            if(global._fibre_app.requests[this.request_id].errors.length > 0){
+                dev_toolbar += `
+                    <div id="fibre_dev_content">
+
+                        <h1>${global._fibre_app.requests.status_code}</h1>
+                `;
+            }
+
+            global._fibre_app.requests[this.request_id].errors.forEach(error => {
+                dev_toolbar += `<p>${error}</p>`;
+            });
+
+
+            dev_toolbar += `<div id="fibre_dev_toolbar">
+                <ul>
+                    <li>
+                        <strong>Status Code:</strong><br>${global._fibre_app.requests.status_code}
+                    </li>
+                    <li>
+                        <strong>Time Took:</strong><br>${time_took}ms
+                    </li>
+                    <li>
+                        <strong>Cached:</strong><br>False
+                    </li>
+                    <li>
+                        <strong>Request ID:</strong><br>${this.request_id}
+                    </li>
+                </ul>
+            </div>
+            <!-- /Fibre Developer Toolbar -->`;
+
+            // Return
+            return dev_toolbar;
+
+        }
+        return '';
     }
 
 }
