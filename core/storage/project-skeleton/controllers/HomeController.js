@@ -4,7 +4,7 @@ module.exports = class HomeController extends BaseController {
 
     init(){
 
-        return this.View.render('welcome', {version: '1.3.1'});
+        return this.View.render('welcome', this.data_layer);
 
     }
 

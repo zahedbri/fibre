@@ -79,6 +79,7 @@ sudo systemctl status snap.fibre-framework.server
     * [Using data from the data_layer in your HTML file](#using-data-from-the-data_layer-in-your-html-file)
     * [Include sub views/templates](#include-sub-views/templates)
     * [IF Conditions](#if-conditions)
+    * [Foreach Loops](#foreach-loops)
 
 # Server Settings
 The server settings is where you can define all of your websites configuration including hosting multiple websites, it's as easy as editing a simple JSON file.
@@ -404,7 +405,7 @@ module.exports = class HomeController extends BaseController {
 
     init(){
 
-        return this.View.render('welcome', {version: '1.3.1'});
+        return this.View.render('welcome', this.data_layer);
 
     }
 
@@ -420,7 +421,7 @@ The above controller has one method, "init", every Controller must have an "init
 Example:
 
 ```
-return this.View.render('support.index', {version: '1.3.1'});
+return this.View.render('support.index', this.data_layer);
 ```
 
 The above view will have the below folder structure:
@@ -478,7 +479,7 @@ module.exports = class HomeController extends BaseController {
 
     init(){
 
-        return this.View.render('welcome', {version: '1.3.1'});
+        return this.View.render('welcome', this.data_layer);
 
     }
 
@@ -567,7 +568,7 @@ Below is an example of the Fibre homepage when you first install Fibre.
             <div class="content">
                 <div class="title m-b-md">
                     Fibre
-                    <small style="font-size:1.5rem;display:block;">version {{ version }}</small>
+                    <small style="font-size:1.5rem;display:block;">version {{ VERSION }}</small>
                 </div>
             </div>
         </div>
@@ -575,12 +576,13 @@ Below is an example of the Fibre homepage when you first install Fibre.
 </html>
 ```
 
-When display variables Fibre uses the curly braces x2 on either side of the variable name, there also needs to be one space either side of the variable name, this is to keep code consistent and clean.
+When displaying variables Fibre uses the curly braces x2 on either side of the variable name, there also needs to be one space either side of the variable name, this is to keep code consistent and clean. Variables can only contain characters between A-Z and are case sensitive.
 
 ### Correct
 
 ```HTML
 {{ my_variable }}
+{{ MY_VARIABLE }} <!-- Different variable than above -->
 ```
 
 ### Wrong
@@ -589,6 +591,22 @@ When display variables Fibre uses the curly braces x2 on either side of the vari
 {{my_variable}}
 { my_variable }
 ```
+
+### Display an Object
+
+```HTML
+{{ QUERY }}
+```
+
+The above will display the query object, if there are any parameters in the request you will see them outputted. Try navigating to the following URL: "http://127.0.0.1/?foo=bar&hello=world".
+
+### Get a value from an Object
+
+```HTML
+{{ QUERY.SCRIPT_NAME }}
+```
+
+The above will output the script name being executed.
 
 ## Include sub views/templates
 You can include another HTML file within your view by using the following syntax:
@@ -623,6 +641,92 @@ You can use if conditions within your views but they are very basic and do not i
                     	<small style="font-size:1.5rem;display:block;">version {{ version }}</small>
                     @endif
                 </div>
+            </div>
+        </div>
+    </body>
+</html>
+```
+
+# Foreach Loops
+You can use foreach loops within your HTML files, you can not nest foreach loops yet but this will be available in future releases. Take a look at the example Controller and View below:
+
+## Controller
+
+```javascript
+"use strict";
+const BaseController = require('./BaseController');
+module.exports = class HomeController extends BaseController {
+
+    init(){
+
+        // Static user data
+        this.data_layer.users = [
+            {
+                id: 1,
+                name: "Ben",
+                location: "London"
+            },
+            {
+                id: 2,
+                name: "Dave",
+                location: "Paris"
+            },
+            {
+                id: 3,
+                name: "Marissa",
+                location: "New York"
+            }
+        ];
+
+        return this.View.render('welcome', this.data_layer);
+
+    }
+
+}
+```
+
+## View
+The **users** variable in the View below relates to the users array in the **this.data_layer** above.
+
+```html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Fibre</title>
+
+    </head>
+    <body>
+        <div class="flex-center position-ref full-height">
+
+            <div class="content">
+                <div class="title m-b-md">
+                    Fibre
+                    <small style="font-size:1.5rem;display:block;font-weight: 300;">version</small>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Name</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(users as key => user)
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.location }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
             </div>
         </div>
     </body>
