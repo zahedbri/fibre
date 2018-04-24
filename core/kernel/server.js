@@ -253,7 +253,6 @@ module.exports = class Server {
                     req._fibre_request_id = request_id;
 
                     // Add to requests
-                    // TODO: Remove requests when request has finished
                     global._fibre_app.requests[request_id] = {
                         id: request_id,
                         stack_trace: [],

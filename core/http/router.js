@@ -180,8 +180,15 @@ module.exports = class Router {
                             // Check security
                             try {
                                 if( (this.website.server_status.security.allow_all === true) || (this.website.server_status.security.allow_all === false && rangeCheck.inRange(this.options.client_ip, this.website.server_status.security.ip_address_block)) ){
+
+                                    // Check for json parameter
+                                    let data_type = 'raw';
+                                    if('undefined' !== typeof this.url_parts.query.json){
+                                        data_type = 'json';
+                                    }
+
                                     resolve(
-                                        Object.assign(route, {is_server_status: true, server_status: this.website.server_status})
+                                        Object.assign(route, {is_server_status: true, server_status: this.website.server_status, data_type: data_type})
                                     );
                                 }else{
                                     reject(403);
