@@ -29,7 +29,7 @@
                 "route": "/server-status",
                 "security": {
                     "allow_all": false,
-                    "ip_address_block": "10.0.0.0/8"
+                    "ip_address_block": ["10.0.0.0/8","127.0.0.0/8"]
                 }
             },
             "default_headers": [
