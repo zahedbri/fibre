@@ -26,4 +26,4 @@ Keep your commit descriptions short and sweet, use a pull request for more descr
 # Ready to create a pull request?
 When you are ready with your code go ahead and make a pull request, make sure you make the pull request against the version you are working towards branch name.
 
-For example, if you are working on the project **1.3.1**, then make a pull request to merge into the branch **1.3.1**.
+For example, if you are working on the project **1.4.0**, then make a pull request to merge into the branch **1.4.0**.
