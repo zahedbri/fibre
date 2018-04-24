@@ -34,7 +34,8 @@ global._fibre_app = {
         requests: 0,
         get: 0,
         post: 0
-    }
+    },
+    requests: []
 };
 
 // Log
