@@ -10,7 +10,7 @@
                 "bind_address": "0.0.0.0"
             },
             "http": {
-                "port": 3000,
+                "port": 80,
                 "enabled": true
             },
             "https": {
@@ -25,11 +25,11 @@
 
             },
             "server_status": {
-                "enabled": true,
+                "enabled": false,
                 "route": "/server-status",
                 "security": {
-                    "allow_all": true,
-                    "ip_address_block": "10.0.0.0/8"
+                    "allow_all": false,
+                    "ip_address_block": ["10.0.0.0/8","127.0.0.0/8"]
                 }
             },
             "default_headers": [
