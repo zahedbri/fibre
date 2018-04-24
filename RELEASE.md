@@ -6,7 +6,7 @@ This document keeps track of what goes into each release.
 ## Bug Fixes
 ---
 
-None
+* Fixed a bug where enabling the dev toolbar and accessing via SSL terminated the server. (Ben Osborne)
 
 ## Improvements
 ---
