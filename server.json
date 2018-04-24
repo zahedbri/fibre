@@ -1,7 +1,7 @@
 {
     "websites": {
         "default": {
-            "dev": true,
+            "dev": false,
             "name": "My default website",
             "website_root": "test/",
             "document_root": "test/public/",
@@ -10,7 +10,7 @@
                 "bind_address": "0.0.0.0"
             },
             "http": {
-                "port": 3000,
+                "port": 80,
                 "enabled": true
             },
             "https": {

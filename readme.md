@@ -68,6 +68,7 @@ sudo systemctl status snap.fibre-framework.server
     * [Website Settings](#website-settings)
     * [Server Status Page](#server-status-page)
     * [Default Security Headers](#default-security-headers)
+    * [Developer Toolbar](#developer-toolbar)
 2. [Server Redirects](#server-redirects)
 3. [Website Structure](#website-structure)
 4. [Routes](#routes)
@@ -254,6 +255,19 @@ Here is an example of what the default security headers look like in **server.js
 ```
 
 > **Note:** A server restart is required for any changes to take affect.
+
+# Developer Toolbar
+You can enable the developer toolbar by adding or modifying the setting "dev" to the value of true in your "server.json" file, example:
+
+```json
+"websites": {
+    "default": {
+        "dev": true,
+        "name": "My default website",
+        "website_root": "test/",
+        "document_root": "test/public/",
+        ...
+```
 
 # Server Redirects
 Your website may have already a list of redirects that need to be implemented server side, Fibre has a simple and easy syntax for adding redirects. Each website has it's own redirects module, the redirects are stored in a JSON file named **redirects.json**, you can find this file in your website directory under **config/**, if your website does not have a redirects.json file then create an empty one with the following contents:
