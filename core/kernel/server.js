@@ -90,6 +90,20 @@ module.exports = class Server {
                             }
                         });
 
+                        // Create a request ID.
+                        const request_id = crypto.randomBytes(16).toString("hex");
+
+                        // Create in req
+                        req._fibre_request_id = request_id;
+
+                        // Add to requests
+                        global._fibre_app.requests[request_id] = {
+                            id: request_id,
+                            stack_trace: [],
+                            errors: [],
+                            start: new Date()
+                        };
+
                         // Handle the request
                         new HandleRequest(website, req, res, req.socket.encrypted || lob_ssl || false);
 
@@ -173,6 +187,20 @@ module.exports = class Server {
                                             }
                                         });
 
+                                        // Create a request ID.
+                                        const request_id = crypto.randomBytes(16).toString("hex");
+
+                                        // Create in req
+                                        req._fibre_request_id = request_id;
+
+                                        // Add to requests
+                                        global._fibre_app.requests[request_id] = {
+                                            id: request_id,
+                                            stack_trace: [],
+                                            errors: [],
+                                            start: new Date()
+                                        };
+
                                         // Handle the request
                                         new HandleRequest(website, req, res, req.socket.encrypted || lob_ssl || false);
 
@@ -253,7 +281,6 @@ module.exports = class Server {
                     req._fibre_request_id = request_id;
 
                     // Add to requests
-                    // TODO: Remove requests when request has finished
                     global._fibre_app.requests[request_id] = {
                         id: request_id,
                         stack_trace: [],

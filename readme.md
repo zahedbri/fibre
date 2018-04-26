@@ -205,7 +205,7 @@ Open up your **server.json** file and look for the JSON object named "server_sta
     "route": "/server-status",
     "security": {
         "allow_all": false,
-        "ip_address_block": "10.0.0.0/8"
+        "ip_address_block": ["10.0.0.0/8","127.0.0.0/8"]
     }
 }
 ```
@@ -218,9 +218,16 @@ Simply change the setting "enabled" to true and change the security settings to 
 | route | String | The URL you want your server status page to appear under. This route cannot be a dynamic route. |
 | security | Object | Holds security properties for the server status module. |
 | security.allow_all | Boolean | If this setting is **true** your server status page will be publicly accessible, meaning anyone can view it. |
-| security.ip_address_block | String | A CIDR block to allow IP address within this range to view the server status page. |
+| security.ip_address_block | String/Array | A CIDR block to allow IP address within this range to view the server status page. This can either be a single string or an array of CIDR blocks. |
 
 You can read about CIDR blocks on the Wikipedia page [Classless Inter-Domain Routing](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+
+### Return server status as JSON
+You can return the server status data as JSON if you wish, simply add the parameter "json" to the end of the URL.
+
+```
+http://127.0.0.1/server-status?json
+```
 
 # Default Security Headers
 By default Fibre will set the below headers to improve security, you can change these values through the **server.json** configuration file, or disable them entirley.

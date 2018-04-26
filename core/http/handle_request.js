@@ -68,6 +68,9 @@ module.exports = class HandleRequest {
                 // Set Status Code
                 response.writeHead(route_data.item.code);
 
+                // Delete request
+                delete global._fibre_app.requests[this.request_id];
+
                 // Write data
                 response.end();
 
@@ -93,6 +96,9 @@ module.exports = class HandleRequest {
 
                 // Write data
                 response.end(route_data.item.data.toString());
+
+                // Delete request
+                delete global._fibre_app.requests[this.request_id];
 
             }else if('undefined' !== typeof route_data.is_file && route_data.is_file){
 
@@ -129,6 +135,9 @@ module.exports = class HandleRequest {
                             // Write data
                             response.end(data.toString());
 
+                            // Delete request
+                            delete global._fibre_app.requests[this.request_id];
+
                             // MD5 of path
                             const md5_of_path = crypto.createHash('md5').update(route_data.url).digest('hex');
 
@@ -161,37 +170,77 @@ module.exports = class HandleRequest {
                 if('undefined' !== typeof route_data.is_server_status && route_data.is_server_status){
 
                     // Set header
-                    response.setHeader("Content-Type", "text/plain");
+                    if(route_data.data_type === 'json'){
+                        response.setHeader("Content-Type", "application/json");
+                    }else{
+                        response.setHeader("Content-Type", "text/plain");
+                    }
 
                     // Get Avg CPU Usage
                     let cpus = os.cpus();
 
+                    let server_status_string = '';
+
                     /**
                      * Plain
                      */
+                    if(route_data.data_type === 'json'){
 
-                    // Get server status
-                    let server_status_string = '';
+                        // Create an object
+                        let json_obj = {
+                            date_time: new Date().toString(),
+                            live_reqs: Object.keys(global._fibre_app.requests).length,
+                            reqs: global._fibre_app.stats.requests,
+                            get: global._fibre_app.stats.get,
+                            post: global._fibre_app.stats.post,
+                            memory_rss_used: process.memoryUsage().rss,
+                            memory_heap_total: process.memoryUsage().heapTotal,
+                            memory_heap_used: process.memoryUsage().heapUsed,
+                            cpus: []
+                        };
 
-                    // Output date and time
-                    server_status_string += new Date().toString() + `\n`;
-                    server_status_string += 'reqs ' + global._fibre_app.stats.requests + `\n`;
-                    server_status_string += 'get ' + global._fibre_app.stats.get + `\n`;
-                    server_status_string += 'post ' + global._fibre_app.stats.post + `\n`;
-                    server_status_string += 'memory rss used ' + process.memoryUsage().rss + `\n`;
-                    server_status_string += 'memory heap total ' + process.memoryUsage().heapTotal + `\n`;
-                    server_status_string += 'memory heap used ' + process.memoryUsage().heapUsed + `\n`;
-                    for(var i = 0, len = cpus.length; i < len; i++) {
-                        server_status_string += 'cpu ' + i + '\n';
-                        var cpu = cpus[i], total = 0;
+                        for(var i = 0, len = cpus.length; i < len; i++) {
+                            json_obj.cpus[i] = {};
+                            json_obj.cpus[i]['cpu_number'] = i;
+                            var cpu = cpus[i], total = 0;
 
-                        for(var type in cpu.times) {
-                            total += cpu.times[type];
+                            for(var type in cpu.times) {
+                                total += cpu.times[type];
+                            }
+
+                            for(type in cpu.times) {
+                                json_obj.cpus[i][type] = Math.round(100 * cpu.times[type] / total);
+                            }
                         }
 
-                        for(type in cpu.times) {
-                            server_status_string += '\t' + type + ' ' +  Math.round(100 * cpu.times[type] / total) + '\n';
+                        server_status_string = JSON.stringify(json_obj);
+
+                    }else{
+
+                        // Get server status
+
+                        // Output date and time
+                        server_status_string += new Date().toString() + `\n`;
+                        server_status_string += 'live_reqs ' + Object.keys(global._fibre_app.requests).length + `\n`;
+                        server_status_string += 'reqs ' + global._fibre_app.stats.requests + `\n`;
+                        server_status_string += 'get ' + global._fibre_app.stats.get + `\n`;
+                        server_status_string += 'post ' + global._fibre_app.stats.post + `\n`;
+                        server_status_string += 'memory rss used ' + process.memoryUsage().rss + `\n`;
+                        server_status_string += 'memory heap total ' + process.memoryUsage().heapTotal + `\n`;
+                        server_status_string += 'memory heap used ' + process.memoryUsage().heapUsed + `\n`;
+                        for(var i = 0, len = cpus.length; i < len; i++) {
+                            server_status_string += 'cpu ' + i + '\n';
+                            var cpu = cpus[i], total = 0;
+
+                            for(var type in cpu.times) {
+                                total += cpu.times[type];
+                            }
+
+                            for(type in cpu.times) {
+                                server_status_string += '\t' + type + ' ' +  Math.round(100 * cpu.times[type] / total) + '\n';
+                            }
                         }
+
                     }
 
                     // Set Status Code
@@ -199,6 +248,9 @@ module.exports = class HandleRequest {
 
                     // Set data
                     response.end(server_status_string);
+
+                    // Delete request
+                    delete global._fibre_app.requests[this.request_id];
 
                 }else{
 
@@ -243,6 +295,9 @@ module.exports = class HandleRequest {
 
                                 // Set data
                                 response.end(raw + dev_html);
+
+                                // Delete request
+                                delete global._fibre_app.requests[this.request_id];
 
                             }).catch((response_error) => {
 
@@ -298,6 +353,9 @@ module.exports = class HandleRequest {
 
         // Include dev toolbar
         file_contents = this.show_dev_toolbar();
+
+        // Delete request
+        delete global._fibre_app.requests[this.request_id];
 
         // Switch on HTTP Code
         switch(http_code){

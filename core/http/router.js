@@ -179,13 +179,48 @@ module.exports = class Router {
 
                             // Check security
                             try {
-                                if( (this.website.server_status.security.allow_all === true) || (this.website.server_status.security.allow_all === false && rangeCheck.inRange(this.options.client_ip, this.website.server_status.security.ip_address_block)) ){
+
+                                // Set pass
+                                let pass = false;
+
+                                // Check for allow all flag
+                                if(this.website.server_status.security.allow_all === true){
+                                    pass = true;
+                                }
+
+                                // Check for IP address
+                                if(this.website.server_status.security.allow_all === false){
+                                    if(Array.isArray(this.website.server_status.security.ip_address_block)){
+                                        this.website.server_status.security.ip_address_block.forEach(block => {
+                                           if(rangeCheck.inRange(this.options.client_ip,block)){
+                                                pass = true;
+                                           }
+                                        });
+                                    }else{
+                                        if(rangeCheck.inRange(this.options.client_ip, this.website.server_status.security.ip_address_block)){
+                                            pass = true;
+                                        }
+                                    }
+                                }
+
+                                // Check Pass
+                                if( pass ){
+
+                                    // Check for json parameter
+                                    let data_type = 'raw';
+                                    if('undefined' !== typeof this.url_parts.query.json){
+                                        data_type = 'json';
+                                    }
+
+                                    // Resolve
                                     resolve(
-                                        Object.assign(route, {is_server_status: true, server_status: this.website.server_status})
+                                        Object.assign(route, {is_server_status: true, server_status: this.website.server_status, data_type: data_type})
                                     );
+
                                 }else{
                                     reject(403);
                                 }
+
                             } catch (error) {
 
                                 console.log(`-> There was an error trying to show the server status page: `);
